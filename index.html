@@ -89,37 +89,68 @@
             flex-direction: column;
             align-items: center;
             gap: 5px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
         }
         .btn i {
             font-size: 20px;
         }
-        .exchange {
-            background: rgba(0, 0, 0, 0.3);
-            margin: 20px;
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: rgba(30, 30, 30, 0.9);
+            width: 90%;
+            max-width: 400px;
             padding: 20px;
             border-radius: 15px;
+            border: 1px solid rgba(185, 103, 255, 0.3);
         }
-        .exchange-title {
-            margin-bottom: 15px;
+        .modal-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
         }
-        .exchange-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .modal-title {
+            font-size: 20px;
+            color: #b967ff;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
         }
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            margin-bottom: 15px;
         }
         .form-group label {
-            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
             color: #b967ff;
         }
         .form-control {
+            width: 100%;
             padding: 10px;
             border-radius: 8px;
             border: 1px solid rgba(185, 103, 255, 0.3);
@@ -127,11 +158,12 @@
             color: white;
         }
         .submit-btn {
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
-            color: white;
-            border: none;
+            width: 100%;
             padding: 12px;
             border-radius: 8px;
+            border: none;
+            background: linear-gradient(to right, #b967ff, #ff5ef3);
+            color: white;
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
@@ -146,9 +178,15 @@
             border-radius: 10px;
             transform: translateX(200%);
             transition: transform 0.3s;
+            z-index: 101;
         }
         .notification.show {
             transform: translateX(0);
+        }
+        .exchange-rate {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -180,21 +218,45 @@
                 <i class="fas fa-exchange-alt"></i>
                 Обменник
             </button>
-            <button class="btn">
-                <i class="fas fa-chart-line"></i>
-                Инвестиции
+            <button class="btn" id="historyBtn">
+                <i class="fas fa-history"></i>
+                История
             </button>
         </div>
-        
-        <div class="exchange" id="exchangeSection" style="display: none;">
-            <div class="exchange-title">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Обмен валют</span>
+    </div>
+    
+    <!-- Модальное окно отправки -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-paper-plane"></i> Отправить деньги</h3>
+                <button class="close-btn" id="closeSendModal">&times;</button>
             </div>
-            <form class="exchange-form" id="exchangeForm">
+            <form id="sendForm">
+                <div class="form-group">
+                    <label for="recipient">Номер карты получателя</label>
+                    <input type="text" id="recipient" class="form-control" placeholder="4276 0000 0000 0000" required>
+                </div>
+                <div class="form-group">
+                    <label for="sendAmount">Сумма (₽)</label>
+                    <input type="number" id="sendAmount" class="form-control" placeholder="1000" min="1" required>
+                </div>
+                <button type="submit" class="submit-btn">Отправить</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Модальное окно обменника -->
+    <div class="modal" id="exchangeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-exchange-alt"></i> Обмен валют</h3>
+                <button class="close-btn" id="closeExchangeModal">&times;</button>
+            </div>
+            <form id="exchangeForm">
                 <div class="form-group">
                     <label for="fromAmount">Сумма</label>
-                    <input type="number" id="fromAmount" class="form-control" placeholder="1000" min="1">
+                    <input type="number" id="fromAmount" class="form-control" placeholder="1000" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="fromCurrency">Из</label>
@@ -211,13 +273,27 @@
                         <option value="EUR">Евро (EUR)</option>
                         <option value="RUB">Рубли (RUB)</option>
                     </select>
+                    <div class="exchange-rate" id="exchangeRateText"></div>
                 </div>
                 <div class="form-group">
-                    <label>Получите</label>
-                    <div id="result" style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">0</div>
+                    <label>Вы получите</label>
+                    <div id="result" class="form-control" style="background: rgba(0,0,0,0.3);">0</div>
                 </div>
                 <button type="button" class="submit-btn" id="convertBtn">Обменять</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- Модальное окно истории -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-history"></i> История операций</h3>
+                <button class="close-btn" id="closeHistoryModal">&times;</button>
+            </div>
+            <div id="historyList" style="max-height: 400px; overflow-y: auto;">
+                <!-- История будет добавляться сюда -->
+            </div>
         </div>
     </div>
     
@@ -225,31 +301,55 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const balance = document.getElementById('balance');
+            // Элементы интерфейса
+            const balanceElement = document.getElementById('balance');
             const earnBtn = document.getElementById('earnBtn');
             const sendBtn = document.getElementById('sendBtn');
             const exchangeBtn = document.getElementById('exchangeBtn');
-            const exchangeSection = document.getElementById('exchangeSection');
+            const historyBtn = document.getElementById('historyBtn');
+            const sendModal = document.getElementById('sendModal');
+            const exchangeModal = document.getElementById('exchangeModal');
+            const historyModal = document.getElementById('historyModal');
+            const closeSendModal = document.getElementById('closeSendModal');
+            const closeExchangeModal = document.getElementById('closeExchangeModal');
+            const closeHistoryModal = document.getElementById('closeHistoryModal');
+            const sendForm = document.getElementById('sendForm');
+            const exchangeForm = document.getElementById('exchangeForm');
             const fromAmount = document.getElementById('fromAmount');
             const fromCurrency = document.getElementById('fromCurrency');
             const toCurrency = document.getElementById('toCurrency');
             const result = document.getElementById('result');
             const convertBtn = document.getElementById('convertBtn');
+            const exchangeRateText = document.getElementById('exchangeRateText');
+            const historyList = document.getElementById('historyList');
             const notification = document.getElementById('notification');
             
-            // Курсы валют
+            // Данные приложения
+            let balance = 50000;
+            let history = [];
             const rates = {
                 RUB: { USD: 0.011, EUR: 0.010 },
                 USD: { RUB: 90.5, EUR: 0.92 },
                 EUR: { RUB: 98.3, USD: 1.09 }
             };
             
-            // Форматирование числа
+            // Инициализация приложения
+            updateBalance();
+            updateExchangeRate();
+            
+            // Функции
             function formatNumber(num) {
                 return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
             
-            // Показать уведомление
+            function parseNumber(str) {
+                return parseFloat(str.replace(/,/g, ''));
+            }
+            
+            function updateBalance() {
+                balanceElement.textContent = formatNumber(balance);
+            }
+            
             function showNotification(message) {
                 notification.textContent = message;
                 notification.classList.add('show');
@@ -258,33 +358,72 @@
                 }, 3000);
             }
             
-            // Заработать деньги
-            earnBtn.addEventListener('click', function() {
-                const currentBalance = parseInt(balance.textContent.replace(/,/g, ''));
-                const newBalance = currentBalance + 1000;
-                balance.textContent = formatNumber(newBalance);
-                showNotification("+ ₽1,000 зачислено на ваш счет");
-            });
+            function addHistory(type, amount, description, details = {}) {
+                const transaction = {
+                    id: Date.now(),
+                    type,
+                    amount,
+                    description,
+                    date: new Date(),
+                    details
+                };
+                history.unshift(transaction);
+                renderHistory();
+                return transaction;
+            }
             
-            // Отправить деньги (не работает)
-            sendBtn.addEventListener('click', function() {
-                showNotification("Функция отправки временно недоступна");
-            });
+            function renderHistory() {
+                historyList.innerHTML = '';
+                history.forEach(transaction => {
+                    const item = document.createElement('div');
+                    item.style.padding = '10px';
+                    item.style.borderBottom = '1px solid rgba(185, 103, 255, 0.1)';
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'space-between';
+                    
+                    const icon = transaction.type === 'earn' ? 'fa-coins' : 
+                                transaction.type === 'send' ? 'fa-paper-plane' : 
+                                transaction.type === 'exchange' ? 'fa-exchange-alt' : 'fa-question';
+                    
+                    const amountClass = transaction.type === 'earn' ? 'color: #4CAF50;' : 
+                                      transaction.type === 'send' ? 'color: #F44336;' : '';
+                    
+                    const amountSign = transaction.type === 'earn' ? '+' : '-';
+                    
+                    item.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas ${icon}" style="color: #b967ff;"></i>
+                            <div>
+                                <div>${transaction.description}</div>
+                                <div style="font-size: 12px; color: #aaa;">
+                                    ${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString()}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="${amountClass} font-weight: bold;">
+                            ${amountSign}${transaction.type === 'exchange' ? '' : '₽'}${formatNumber(transaction.amount)}
+                        </div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
             
-            // Показать/скрыть обменник
-            exchangeBtn.addEventListener('click', function() {
-                if (exchangeSection.style.display === 'none') {
-                    exchangeSection.style.display = 'block';
-                } else {
-                    exchangeSection.style.display = 'none';
+            function updateExchangeRate() {
+                const from = fromCurrency.value;
+                const to = toCurrency.value;
+                if (from === to) {
+                    exchangeRateText.textContent = '';
+                    return;
                 }
-            });
+                const rate = rates[from][to];
+                const reverseRate = rates[to][from];
+                exchangeRateText.textContent = `1 ${from} = ${rate.toFixed(4)} ${to} | 1 ${to} = ${reverseRate.toFixed(4)} ${from}`;
+            }
             
-            // Конвертация валют
             function convertCurrency() {
                 const amount = parseFloat(fromAmount.value);
-                if (isNaN(amount) {
-                    result.textContent = "Введите сумму";
+                if (isNaN(amount) || amount <= 0) {
+                    result.textContent = '0';
                     return;
                 }
                 
@@ -300,13 +439,124 @@
                 result.textContent = convertedAmount.toFixed(2);
             }
             
-            // Слушатели событий для обменника
+            // Обработчики событий
+            earnBtn.addEventListener('click', function() {
+                const amount = 1000;
+                balance += amount;
+                updateBalance();
+                addHistory('earn', amount, 'Заработок в приложении');
+                showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счет`);
+            });
+            
+            sendBtn.addEventListener('click', function() {
+                sendModal.classList.add('active');
+            });
+            
+            exchangeBtn.addEventListener('click', function() {
+                exchangeModal.classList.add('active');
+            });
+            
+            historyBtn.addEventListener('click', function() {
+                historyModal.classList.add('active');
+            });
+            
+            closeSendModal.addEventListener('click', function() {
+                sendModal.classList.remove('active');
+            });
+            
+            closeExchangeModal.addEventListener('click', function() {
+                exchangeModal.classList.remove('active');
+            });
+            
+            closeHistoryModal.addEventListener('click', function() {
+                historyModal.classList.remove('active');
+            });
+            
+            sendForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const recipient = document.getElementById('recipient').value;
+                const amount = parseFloat(document.getElementById('sendAmount').value);
+                
+                if (isNaN(amount) {
+                    showNotification('Введите корректную сумму');
+                    return;
+                }
+                
+                if (amount <= 0) {
+                    showNotification('Сумма должна быть больше нуля');
+                    return;
+                }
+                
+                if (amount > balance) {
+                    showNotification('Недостаточно средств на счете');
+                    return;
+                }
+                
+                balance -= amount;
+                updateBalance();
+                addHistory('send', amount, 'Перевод средств', { recipient });
+                showNotification(`Перевод ₽${formatNumber(amount)} на карту ${recipient} выполнен`);
+                
+                sendForm.reset();
+                sendModal.classList.remove('active');
+            });
+            
             fromAmount.addEventListener('input', convertCurrency);
-            fromCurrency.addEventListener('change', convertCurrency);
-            toCurrency.addEventListener('change', convertCurrency);
-            convertBtn.addEventListener('click', function() {
+            fromCurrency.addEventListener('change', function() {
+                updateExchangeRate();
                 convertCurrency();
-                showNotification("Конвертация выполнена");
+            });
+            toCurrency.addEventListener('change', function() {
+                updateExchangeRate();
+                convertCurrency();
+            });
+            
+            convertBtn.addEventListener('click', function() {
+                const amount = parseFloat(fromAmount.value);
+                if (isNaN(amount) {
+                    showNotification('Введите сумму для обмена');
+                    return;
+                }
+                
+                if (amount <= 0) {
+                    showNotification('Сумма должна быть больше нуля');
+                    return;
+                }
+                
+                const from = fromCurrency.value;
+                const to = toCurrency.value;
+                
+                if (from === to) {
+                    showNotification('Выберите разные валюты для обмена');
+                    return;
+                }
+                
+                const convertedAmount = amount * rates[from][to];
+                addHistory('exchange', amount, `Обмен ${from} → ${to}`, {
+                    fromAmount: amount,
+                    fromCurrency: from,
+                    toAmount: convertedAmount,
+                    toCurrency: to
+                });
+                
+                showNotification(`Обмен ${amount} ${from} на ${convertedAmount.toFixed(2)} ${to} выполнен`);
+                exchangeForm.reset();
+                result.textContent = '0';
+                exchangeModal.classList.remove('active');
+            });
+            
+            // Закрытие модальных окон при клике вне их
+            window.addEventListener('click', function(e) {
+                if (e.target === sendModal) {
+                    sendModal.classList.remove('active');
+                }
+                if (e.target === exchangeModal) {
+                    exchangeModal.classList.remove('active');
+                }
+                if (e.target === historyModal) {
+                    historyModal.classList.remove('active');
+                }
             });
         });
     </script>
