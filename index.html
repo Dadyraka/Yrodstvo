@@ -3,634 +3,680 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LingoUng Bank</title>
+    <title>LingoUng Bank - Кадыровы</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #1A1A1A;
+            --darker: #0D0D0D;
+            --light: #E6E6FA;
+            --accent: #BA55D3;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
+        
         body {
-            background: linear-gradient(135deg, #1a0a2e, #2d0b4e);
+            background: linear-gradient(135deg, var(--darker), var(--dark));
             min-height: 100vh;
             color: white;
-            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
+        
         .container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(138, 43, 226, 0.3);
+            border: 1px solid rgba(138, 43, 226, 0.2);
         }
+        
         .header {
             padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, var(--darker), var(--dark));
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.3);
         }
+        
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .user {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .user-avatar {
+        
+        .logo i {
+            font-size: 28px;
+            color: var(--accent);
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 22px;
+        }
+        
+        .user-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .user-btn {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #b967ff, #ff5ef3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        .balance-card {
-            background: rgba(0, 0, 0, 0.3);
-            margin: 20px;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .balance-amount {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .actions {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            padding: 0 20px 20px;
-        }
-        .btn {
-            padding: 15px;
-            border-radius: 10px;
             border: none;
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary);
+        }
+        
+        .user-content {
+            padding: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .user-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .user-status {
+            font-size: 14px;
+            color: var(--accent);
+            margin-top: 5px;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+        
+        .balance-title {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .currency {
+            font-size: 20px;
+            color: var(--accent);
+            margin-right: 5px;
+        }
+        
+        .bank-cards {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .bank-card {
+            min-width: 260px;
+            height: 160px;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-visa {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+        
+        .card-unionpay {
+            background: linear-gradient(135deg, #1e2a3a, #0f2027);
+        }
+        
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #FFD700, #C0C0C0);
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .card-chip::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%),
+                linear-gradient(0deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%);
+        }
+        
+        .card-number {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            font-size: 18px;
+            margin: 15px 0;
+        }
+        
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .card-holder, .card-expiry {
+            font-size: 14px;
+        }
+        
+        .card-logo {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-weight: 600;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            transition: transform 0.2s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .btn i {
-            font-size: 20px;
-        }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
+            gap: 8px;
+            cursor: pointer;
             transition: all 0.3s;
         }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
         }
-        .modal-content {
-            background: rgba(30, 30, 30, 0.9);
-            width: 90%;
-            max-width: 400px;
-            padding: 20px;
+        
+        .action-btn i {
+            font-size: 24px;
+        }
+        
+        .transactions {
+            background: rgba(30, 30, 30, 0.6);
             border-radius: 15px;
-            border: 1px solid rgba(185, 103, 255, 0.3);
+            padding: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
         }
-        .modal-header {
+        
+        .transactions-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .transaction-list {
+            list-style: none;
+        }
+        
+        .transaction-item {
             display: flex;
             justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.1);
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-info {
+            display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 10px;
         }
-        .modal-title {
-            font-size: 20px;
-            color: #b967ff;
+        
+        .transaction-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(138, 43, 226, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
+        
+        .transaction-amount {
+            font-weight: 600;
         }
-        .form-group {
-            margin-bottom: 15px;
+        
+        .income {
+            color: #4CAF50;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #b967ff;
+        
+        .expense {
+            color: #F44336;
         }
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(185, 103, 255, 0.3);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #b967ff;
-            padding: 15px;
+            background: rgba(30, 30, 30, 0.9);
+            color: white;
+            padding: 15px 25px;
             border-radius: 10px;
+            border-left: 4px solid var(--primary);
             transform: translateX(200%);
-            transition: transform 0.3s;
-            z-index: 101;
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
         }
+        
         .notification.show {
             transform: translateX(0);
         }
-        .exchange-rate {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-        #historyList {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .history-item {
-            padding: 10px;
-            border-bottom: 1px solid rgba(185, 103, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        .history-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: rgba(185, 103, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-        }
-        .history-details {
-            flex-grow: 1;
-        }
-        .history-amount.income {
-            color: #4CAF50;
-        }
-        .history-amount.expense {
-            color: #F44336;
-        }
-        .history-date {
-            font-size: 12px;
-            color: #aaa;
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">LingoUng Bank</div>
-            <div class="user">
+            <div class="logo">
+                <i class="fas fa-university"></i>
+                <div class="logo-text">LingoUng Bank</div>
+            </div>
+            <div class="user-selector">
+                <button class="user-btn active" id="damirBtn">Д</button>
+                <button class="user-btn" id="darinaBtn">Д</button>
+            </div>
+        </div>
+        
+        <!-- Дамир Кадыров -->
+        <div class="user-content" id="damirContent">
+            <div class="user-info">
                 <div class="user-avatar">ДК</div>
+                <div>
+                    <div class="user-name">Дамир Кадыров</div>
+                    <div class="user-status">Gold клиент</div>
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-title">Текущий баланс</div>
+                <div class="balance-amount"><span class="currency">₽</span> <span id="damirBalance">87,450.00</span></div>
+                <div class="balance-title">Доступно для снятия</div>
+            </div>
+            
+            <div class="bank-cards">
+                <div class="bank-card card-visa">
+                    <div class="card-chip"></div>
+                    <div class="card-number">4276 8100 1234 5678</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DAMIR KADYROV</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">05/27</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">VISA</div>
+                </div>
+                
+                <div class="bank-card card-unionpay">
+                    <div class="card-chip"></div>
+                    <div class="card-number">6212 3456 7890 1234</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DAMIR KADYROV</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">08/26</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">UnionPay</div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn" id="damirEarnBtn">
+                    <i class="fas fa-coins"></i>
+                    <span>Заработать</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Отправить</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Перевести</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Инвестиции</span>
+                </button>
+            </div>
+            
+            <div class="transactions">
+                <div class="transactions-title">
+                    <i class="fas fa-history"></i>
+                    <span>Последние операции</span>
+                </div>
+                <ul class="transaction-list" id="damirTransactions">
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div>Онлайн покупки</div>
+                                <div style="font-size: 12px; color: #aaa;">Сегодня, 14:30</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- ₽2,450.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div>
+                                <div>Зарплата</div>
+                                <div style="font-size: 12px; color: #aaa;">15 июля, 09:00</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+ ₽75,000.00</div>
+                    </li>
+                </ul>
             </div>
         </div>
         
-        <div class="balance-card">
-            <div>Ваш баланс</div>
-            <div class="balance-amount">₽<span id="balance">50,000</span></div>
-            <div>Доступно для снятия</div>
-        </div>
-        
-        <div class="actions">
-            <button class="btn" id="earnBtn">
-                <i class="fas fa-coins"></i>
-                Заработать
-            </button>
-            <button class="btn" id="sendBtn">
-                <i class="fas fa-paper-plane"></i>
-                Отправить
-            </button>
-            <button class="btn" id="exchangeBtn">
-                <i class="fas fa-exchange-alt"></i>
-                Обменник
-            </button>
-            <button class="btn" id="historyBtn">
-                <i class="fas fa-history"></i>
-                История
-            </button>
+        <!-- Дарина Кадырова -->
+        <div class="user-content hidden" id="darinaContent">
+            <div class="user-info">
+                <div class="user-avatar">ДК</div>
+                <div>
+                    <div class="user-name">Дарина Кадырова</div>
+                    <div class="user-status">Platinum клиент</div>
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-title">Текущий баланс</div>
+                <div class="balance-amount"><span class="currency">₽</span> <span id="darinaBalance">124,843.00</span></div>
+                <div class="balance-title">Доступно для снятия</div>
+            </div>
+            
+            <div class="bank-cards">
+                <div class="bank-card card-visa">
+                    <div class="card-chip"></div>
+                    <div class="card-number">4276 8100 9850 3214</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DARINA KADYROVA</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">07/28</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">VISA</div>
+                </div>
+                
+                <div class="bank-card card-unionpay">
+                    <div class="card-chip"></div>
+                    <div class="card-number">6212 9876 5432 1098</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DARINA KADYROVA</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">11/27</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">UnionPay</div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn" id="darinaEarnBtn">
+                    <i class="fas fa-coins"></i>
+                    <span>Заработать</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Отправить</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Перевести</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Инвестиции</span>
+                </button>
+            </div>
+            
+            <div class="transactions">
+                <div class="transactions-title">
+                    <i class="fas fa-history"></i>
+                    <span>Последние операции</span>
+                </div>
+                <ul class="transaction-list" id="darinaTransactions">
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <div>
+                                <div>Фриланс проект</div>
+                                <div style="font-size: 12px; color: #aaa;">Сегодня, 14:30</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+ ₽5,200.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div>Онлайн магазин</div>
+                                <div style="font-size: 12px; color: #aaa;">Вчера, 09:15</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- ₽8,450.00</div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
     
-    <!-- Модальное окно отправки -->
-    <div class="modal" id="sendModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title"><i class="fas fa-paper-plane"></i> Отправить деньги</h3>
-                <button class="close-btn" id="closeSendModal">&times;</button>
-            </div>
-            <form id="sendForm">
-                <div class="form-group">
-                    <label for="recipient">Номер карты получателя</label>
-                    <input type="text" id="recipient" class="form-control" placeholder="4276 0000 0000 0000" required>
-                </div>
-                <div class="form-group">
-                    <label for="sendAmount">Сумма (₽)</label>
-                    <input type="number" id="sendAmount" class="form-control" placeholder="1000" min="1" required>
-                </div>
-                <button type="submit" class="submit-btn">Отправить</button>
-            </form>
-        </div>
+    <div class="notification" id="notification">
+        + ₽1,000.00 зачислено на ваш счёт!
     </div>
-    
-    <!-- Модальное окно обменника -->
-    <div class="modal" id="exchangeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title"><i class="fas fa-exchange-alt"></i> Обмен валют</h3>
-                <button class="close-btn" id="closeExchangeModal">&times;</button>
-            </div>
-            <form id="exchangeForm">
-                <div class="form-group">
-                    <label for="fromAmount">Сумма</label>
-                    <input type="number" id="fromAmount" class="form-control" placeholder="1000" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="fromCurrency">Из</label>
-                    <select id="fromCurrency" class="form-control">
-                        <option value="RUB">Рубли (RUB)</option>
-                        <option value="USD">Доллары (USD)</option>
-                        <option value="EUR">Евро (EUR)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="toCurrency">В</label>
-                    <select id="toCurrency" class="form-control">
-                        <option value="USD">Доллары (USD)</option>
-                        <option value="EUR">Евро (EUR)</option>
-                        <option value="RUB">Рубли (RUB)</option>
-                    </select>
-                    <div class="exchange-rate" id="exchangeRateText"></div>
-                </div>
-                <div class="form-group">
-                    <label>Вы получите</label>
-                    <div id="result" class="form-control" style="background: rgba(0,0,0,0.3);">0</div>
-                </div>
-                <button type="button" class="submit-btn" id="convertBtn">Обменять</button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Модальное окно истории -->
-    <div class="modal" id="historyModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title"><i class="fas fa-history"></i> История операций</h3>
-                <button class="close-btn" id="closeHistoryModal">&times;</button>
-            </div>
-            <div id="historyList">
-                <!-- История будет добавляться сюда -->
-            </div>
-        </div>
-    </div>
-    
-    <div class="notification" id="notification"></div>
 
     <script>
-        // Инициализация данных приложения
-        const app = {
-            balance: 50000,
-            history: [],
-            rates: {
-                RUB: { USD: 0.011, EUR: 0.010 },
-                USD: { RUB: 90.5, EUR: 0.92 },
-                EUR: { RUB: 98.3, USD: 1.09 }
-            },
-            
-            init: function() {
-                // Инициализация элементов
-                this.balanceElement = document.getElementById('balance');
-                this.earnBtn = document.getElementById('earnBtn');
-                this.sendBtn = document.getElementById('sendBtn');
-                this.exchangeBtn = document.getElementById('exchangeBtn');
-                this.historyBtn = document.getElementById('historyBtn');
-                this.sendModal = document.getElementById('sendModal');
-                this.exchangeModal = document.getElementById('exchangeModal');
-                this.historyModal = document.getElementById('historyModal');
-                this.closeSendModal = document.getElementById('closeSendModal');
-                this.closeExchangeModal = document.getElementById('closeExchangeModal');
-                this.closeHistoryModal = document.getElementById('closeHistoryModal');
-                this.sendForm = document.getElementById('sendForm');
-                this.exchangeForm = document.getElementById('exchangeForm');
-                this.fromAmount = document.getElementById('fromAmount');
-                this.fromCurrency = document.getElementById('fromCurrency');
-                this.toCurrency = document.getElementById('toCurrency');
-                this.result = document.getElementById('result');
-                this.convertBtn = document.getElementById('convertBtn');
-                this.exchangeRateText = document.getElementById('exchangeRateText');
-                this.historyList = document.getElementById('historyList');
-                this.notification = document.getElementById('notification');
-                
-                // Начальная настройка
-                this.updateBalance();
-                this.updateExchangeRate();
-                this.setupEventListeners();
-                
-                // Добавляем начальные данные в историю
-                this.addHistory('earn', 50000, 'Начальный баланс');
-            },
-            
-            setupEventListeners: function() {
-                // Кнопки в основном интерфейсе
-                this.earnBtn.addEventListener('click', this.handleEarn.bind(this));
-                this.sendBtn.addEventListener('click', this.showSendModal.bind(this));
-                this.exchangeBtn.addEventListener('click', this.showExchangeModal.bind(this));
-                this.historyBtn.addEventListener('click', this.showHistoryModal.bind(this));
-                
-                // Кнопки закрытия модальных окон
-                this.closeSendModal.addEventListener('click', this.hideSendModal.bind(this));
-                this.closeExchangeModal.addEventListener('click', this.hideExchangeModal.bind(this));
-                this.closeHistoryModal.addEventListener('click', this.hideHistoryModal.bind(this));
-                
-                // Форма отправки
-                this.sendForm.addEventListener('submit', this.handleSend.bind(this));
-                
-                // Обменник валют
-                this.fromAmount.addEventListener('input', this.convertCurrency.bind(this));
-                this.fromCurrency.addEventListener('change', this.handleCurrencyChange.bind(this));
-                this.toCurrency.addEventListener('change', this.handleCurrencyChange.bind(this));
-                this.convertBtn.addEventListener('click', this.handleConvert.bind(this));
-                
-                // Закрытие модальных окон при клике вне их
-                window.addEventListener('click', this.handleOutsideClick.bind(this));
-            },
-            
-            // Функции для работы с балансом
-            formatNumber: function(num) {
-                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            },
-            
-            parseNumber: function(str) {
-                return parseFloat(str.replace(/,/g, ''));
-            },
-            
-            updateBalance: function() {
-                this.balanceElement.textContent = this.formatNumber(this.balance);
-            },
-            
-            // Функции для уведомлений
-            showNotification: function(message) {
-                this.notification.textContent = message;
-                this.notification.classList.add('show');
-                setTimeout(() => {
-                    this.notification.classList.remove('show');
-                }, 3000);
-            },
-            
-            // Функции для истории операций
-            addHistory: function(type, amount, description, details = {}) {
-                const transaction = {
-                    id: Date.now(),
-                    type,
-                    amount,
-                    description,
-                    date: new Date(),
-                    details
-                };
-                this.history.unshift(transaction);
-                this.renderHistory();
-                return transaction;
-            },
-            
-            renderHistory: function() {
-                this.historyList.innerHTML = '';
-                this.history.forEach(transaction => {
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    
-                    const iconClass = {
-                        'earn': 'fa-coins',
-                        'send': 'fa-paper-plane',
-                        'exchange': 'fa-exchange-alt'
-                    }[transaction.type] || 'fa-question';
-                    
-                    const amountClass = transaction.type === 'earn' ? 'income' : 
-                                      transaction.type === 'send' ? 'expense' : '';
-                    
-                    const amountSign = transaction.type === 'earn' ? '+' : '-';
-                    const currency = transaction.type === 'exchange' ? 
-                                   (transaction.details.fromCurrency || '') : '₽';
-                    
-                    item.innerHTML = `
-                        <div style="display: flex; align-items: center;">
-                            <div class="history-icon">
-                                <i class="fas ${iconClass}"></i>
-                            </div>
-                            <div class="history-details">
-                                <div>${transaction.description}</div>
-                                <div class="history-date">
-                                    ${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString()}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="history-amount ${amountClass}">
-                            ${amountSign}${currency}${this.formatNumber(transaction.amount)}
-                        </div>
-                    `;
-                    this.historyList.appendChild(item);
-                });
-            },
-            
-            // Функции для обменника валют
-            updateExchangeRate: function() {
-                const from = this.fromCurrency.value;
-                const to = this.toCurrency.value;
-                if (from === to) {
-                    this.exchangeRateText.textContent = '';
-                    return;
-                }
-                const rate = this.rates[from][to];
-                const reverseRate = this.rates[to][from];
-                this.exchangeRateText.textContent = `1 ${from} = ${rate.toFixed(4)} ${to} | 1 ${to} = ${reverseRate.toFixed(4)} ${from}`;
-            },
-            
-            convertCurrency: function() {
-                const amount = parseFloat(this.fromAmount.value);
-                if (isNaN(amount) {
-                    this.result.textContent = '0';
-                    return;
-                }
-                
-                const from = this.fromCurrency.value;
-                const to = this.toCurrency.value;
-                
-                if (from === to) {
-                    this.result.textContent = amount.toFixed(2);
-                    return;
-                }
-                
-                const convertedAmount = amount * this.rates[from][to];
-                this.result.textContent = convertedAmount.toFixed(2);
-            },
-            
-            // Обработчики событий
-            handleEarn: function() {
-                const amount = 1000;
-                this.balance += amount;
-                this.updateBalance();
-                this.addHistory('earn', amount, 'Заработок в приложении');
-                this.showNotification(`+ ₽${this.formatNumber(amount)} зачислено на ваш счет`);
-            },
-            
-            showSendModal: function() {
-                this.sendModal.classList.add('active');
-            },
-            
-            hideSendModal: function() {
-                this.sendModal.classList.remove('active');
-            },
-            
-            showExchangeModal: function() {
-                this.exchangeModal.classList.add('active');
-            },
-            
-            hideExchangeModal: function() {
-                this.exchangeModal.classList.remove('active');
-            },
-            
-            showHistoryModal: function() {
-                this.historyModal.classList.add('active');
-            },
-            
-            hideHistoryModal: function() {
-                this.historyModal.classList.remove('active');
-            },
-            
-            handleSend: function(e) {
-                e.preventDefault();
-                
-                const recipient = this.recipient.value;
-                const amount = parseFloat(this.sendAmount.value);
-                
-                if (isNaN(amount)) {
-                    this.showNotification('Введите корректную сумму');
-                    return;
-                }
-                
-                if (amount <= 0) {
-                    this.showNotification('Сумма должна быть больше нуля');
-                    return;
-                }
-                
-                if (amount > this.balance) {
-                    this.showNotification('Недостаточно средств на счете');
-                    return;
-                }
-                
-                this.balance -= amount;
-                this.updateBalance();
-                this.addHistory('send', amount, 'Перевод средств', { recipient });
-                this.showNotification(`Перевод ₽${this.formatNumber(amount)} на карту ${recipient} выполнен`);
-                
-                this.sendForm.reset();
-                this.hideSendModal();
-            },
-            
-            handleCurrencyChange: function() {
-                this.updateExchangeRate();
-                this.convertCurrency();
-            },
-            
-            handleConvert: function() {
-                const amount = parseFloat(this.fromAmount.value);
-                if (isNaN(amount)) {
-                    this.showNotification('Введите сумму для обмена');
-                    return;
-                }
-                
-                if (amount <= 0) {
-                    this.showNotification('Сумма должна быть больше нуля');
-                    return;
-                }
-                
-                const from = this.fromCurrency.value;
-                const to = this.toCurrency.value;
-                
-                if (from === to) {
-                    this.showNotification('Выберите разные валюты для обмена');
-                    return;
-                }
-                
-                const convertedAmount = amount * this.rates[from][to];
-                this.addHistory('exchange', amount, `Обмен ${from} → ${to}`, {
-                    fromAmount: amount,
-                    fromCurrency: from,
-                    toAmount: convertedAmount,
-                    toCurrency: to
-                });
-                
-                this.showNotification(`Обмен ${amount} ${from} на ${convertedAmount.toFixed(2)} ${to} выполнен`);
-                this.exchangeForm.reset();
-                this.result.textContent = '0';
-                this.hideExchangeModal();
-            },
-            
-            handleOutsideClick: function(e) {
-                if (e.target === this.sendModal) {
-                    this.hideSendModal();
-                }
-                if (e.target === this.exchangeModal) {
-                    this.hideExchangeModal();
-                }
-                if (e.target === this.historyModal) {
-                    this.hideHistoryModal();
-                }
-            }
-        };
-        
-        // Инициализация приложения после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
-            app.init();
+            // Элементы интерфейса
+            const damirBtn = document.getElementById('damirBtn');
+            const darinaBtn = document.getElementById('darinaBtn');
+            const damirContent = document.getElementById('damirContent');
+            const darinaContent = document.getElementById('darinaContent');
+            const damirBalance = document.getElementById('damirBalance');
+            const darinaBalance = document.getElementById('darinaBalance');
+            const damirEarnBtn = document.getElementById('damirEarnBtn');
+            const darinaEarnBtn = document.getElementById('darinaEarnBtn');
+            const damirTransactions = document.getElementById('damirTransactions');
+            const darinaTransactions = document.getElementById('darinaTransactions');
+            const notification = document.getElementById('notification');
+            
+            // Форматирование числа
+            function formatNumber(num) {
+                return num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+            
+            // Парсинг числа
+            function parseNumber(str) {
+                return parseFloat(str.replace(/,/g, ''));
+            }
+            
+            // Показать уведомление
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Добавить транзакцию
+            function addTransaction(list, type, amount, description) {
+                const now = new Date();
+                const dateString = now.toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+                const timeString = now.toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const transaction = document.createElement('li');
+                transaction.className = 'transaction-item';
+                
+                const icon = type === 'income' ? 'fa-coins' : 'fa-shopping-cart';
+                const amountClass = type === 'income' ? 'income' : 'expense';
+                const amountSign = type === 'income' ? '+' : '-';
+                
+                transaction.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-icon">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div>
+                            <div>${description}</div>
+                            <div style="font-size: 12px; color: #aaa;">${dateString}, ${timeString}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">${amountSign} ₽${formatNumber(amount)}</div>
+                `;
+                
+                list.insertBefore(transaction, list.firstChild);
+            }
+            
+            // Заработать деньги
+            function earnMoney(balanceElement, transactionsList) {
+                const amount = 1000;
+                const currentBalance = parseNumber(balanceElement.textContent);
+                const newBalance = currentBalance + amount;
+                
+                balanceElement.textContent = formatNumber(newBalance);
+                addTransaction(transactionsList, 'income', amount, 'Заработок в приложении');
+                showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счёт!`);
+            }
+            
+            // Переключение пользователей
+            damirBtn.addEventListener('click', function() {
+                damirBtn.classList.add('active');
+                darinaBtn.classList.remove('active');
+                damirContent.classList.remove('hidden');
+                darinaContent.classList.add('hidden');
+            });
+            
+            darinaBtn.addEventListener('click', function() {
+                darinaBtn.classList.add('active');
+                damirBtn.classList.remove('active');
+                darinaContent.classList.remove('hidden');
+                damirContent.classList.add('hidden');
+            });
+            
+            // Кнопки заработка
+            damirEarnBtn.addEventListener('click', function() {
+                earnMoney(damirBalance, damirTransactions);
+            });
+            
+            darinaEarnBtn.addEventListener('click', function() {
+                earnMoney(darinaBalance, darinaTransactions);
+            });
         });
     </script>
 </body>
