@@ -355,6 +355,89 @@
         .hidden {
             display: none;
         }
+
+        /* Модальное окно для отправки */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            background-color: rgba(30, 30, 30, 0.8);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.cancel {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .modal-btn.send {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .modal-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -421,7 +504,7 @@
                     <i class="fas fa-coins"></i>
                     <span>Заработать</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" id="damirSendBtn">
                     <i class="fas fa-paper-plane"></i>
                     <span>Отправить</span>
                 </button>
@@ -520,7 +603,7 @@
                     <i class="fas fa-coins"></i>
                     <span>Заработать</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" id="darinaSendBtn">
                     <i class="fas fa-paper-plane"></i>
                     <span>Отправить</span>
                 </button>
@@ -569,6 +652,32 @@
         </div>
     </div>
     
+    <!-- Модальное окно для отправки денег -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content">
+            <div class="modal-title">Отправить деньги</div>
+            <div class="form-group">
+                <label for="recipient">Получатель</label>
+                <input type="text" id="recipient" placeholder="Введите имя получателя">
+            </div>
+            <div class="form-group">
+                <label for="amount">Сумма (₽)</label>
+                <input type="number" id="amount" placeholder="Введите сумму">
+            </div>
+            <div class="form-group">
+                <label for="card">С карты</label>
+                <select id="card">
+                    <option value="4276 8100 1234 5678">VISA 4276 8100 1234 5678</option>
+                    <option value="6212 3456 7890 1234">UnionPay 6212 3456 7890 1234</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelSend">Отмена</button>
+                <button class="modal-btn send" id="confirmSend">Отправить</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="notification" id="notification">
         + ₽1,000.00 зачислено на ваш счёт!
     </div>
@@ -584,9 +693,22 @@
             const darinaBalance = document.getElementById('darinaBalance');
             const damirEarnBtn = document.getElementById('damirEarnBtn');
             const darinaEarnBtn = document.getElementById('darinaEarnBtn');
+            const damirSendBtn = document.getElementById('damirSendBtn');
+            const darinaSendBtn = document.getElementById('darinaSendBtn');
             const damirTransactions = document.getElementById('damirTransactions');
             const darinaTransactions = document.getElementById('darinaTransactions');
             const notification = document.getElementById('notification');
+            
+            // Элементы модального окна
+            const sendModal = document.getElementById('sendModal');
+            const cancelSend = document.getElementById('cancelSend');
+            const confirmSend = document.getElementById('confirmSend');
+            const recipientInput = document.getElementById('recipient');
+            const amountInput = document.getElementById('amount');
+            const cardSelect = document.getElementById('card');
+            
+            // Текущий активный пользователь
+            let currentUser = 'damir';
             
             // Форматирование числа
             function formatNumber(num) {
@@ -654,12 +776,52 @@
                 showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счёт!`);
             }
             
+            // Отправить деньги
+            function sendMoney(balanceElement, transactionsList) {
+                const amount = parseFloat(amountInput.value);
+                const recipient = recipientInput.value.trim();
+                
+                if (!recipient || !amount) {
+                    showNotification('Заполните все поля!');
+                    return;
+                }
+                
+                const currentBalance = parseNumber(balanceElement.textContent);
+                
+                if (amount > currentBalance) {
+                    showNotification('Недостаточно средств на счете!');
+                    return;
+                }
+                
+                if (amount <= 0) {
+                    showNotification('Сумма должна быть больше нуля!');
+                    return;
+                }
+                
+                const newBalance = currentBalance - amount;
+                balanceElement.textContent = formatNumber(newBalance);
+                addTransaction(transactionsList, 'expense', amount, `Перевод ${recipient}`);
+                showNotification(`- ₽${formatNumber(amount)} отправлено ${recipient}`);
+                
+                // Закрываем модальное окно
+                sendModal.style.display = 'none';
+                recipientInput.value = '';
+                amountInput.value = '';
+            }
+            
             // Переключение пользователей
             damirBtn.addEventListener('click', function() {
                 damirBtn.classList.add('active');
                 darinaBtn.classList.remove('active');
                 damirContent.classList.remove('hidden');
                 darinaContent.classList.add('hidden');
+                currentUser = 'damir';
+                
+                // Обновляем список карт для Дамира
+                cardSelect.innerHTML = `
+                    <option value="4276 8100 1234 5678">VISA 4276 8100 1234 5678</option>
+                    <option value="6212 3456 7890 1234">UnionPay 6212 3456 7890 1234</option>
+                `;
             });
             
             darinaBtn.addEventListener('click', function() {
@@ -667,6 +829,13 @@
                 damirBtn.classList.remove('active');
                 darinaContent.classList.remove('hidden');
                 damirContent.classList.add('hidden');
+                currentUser = 'darina';
+                
+                // Обновляем список карт для Дарины
+                cardSelect.innerHTML = `
+                    <option value="4276 8100 9850 3214">VISA 4276 8100 9850 3214</option>
+                    <option value="6212 9876 5432 1098">UnionPay 6212 9876 5432 1098</option>
+                `;
             });
             
             // Кнопки заработка
@@ -676,6 +845,39 @@
             
             darinaEarnBtn.addEventListener('click', function() {
                 earnMoney(darinaBalance, darinaTransactions);
+            });
+            
+            // Кнопки отправки денег
+            damirSendBtn.addEventListener('click', function() {
+                sendModal.style.display = 'flex';
+            });
+            
+            darinaSendBtn.addEventListener('click', function() {
+                sendModal.style.display = 'flex';
+            });
+            
+            // Кнопки в модальном окне
+            cancelSend.addEventListener('click', function() {
+                sendModal.style.display = 'none';
+                recipientInput.value = '';
+                amountInput.value = '';
+            });
+            
+            confirmSend.addEventListener('click', function() {
+                if (currentUser === 'damir') {
+                    sendMoney(damirBalance, damirTransactions);
+                } else {
+                    sendMoney(darinaBalance, darinaTransactions);
+                }
+            });
+            
+            // Закрытие модального окна при клике вне его
+            window.addEventListener('click', function(event) {
+                if (event.target === sendModal) {
+                    sendModal.style.display = 'none';
+                    recipientInput.value = '';
+                    amountInput.value = '';
+                }
             });
         });
     </script>
