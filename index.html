@@ -6,9 +6,440 @@
     <title>LingoUng Bank - Кадыровы</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Все предыдущие стили остаются без изменений */
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #1A1A1A;
+            --darker: #0D0D0D;
+            --light: #E6E6FA;
+            --accent: #BA55D3;
+        }
         
-        /* Добавляем стили для модального окна инвестиций */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+        
+        .header {
+            padding: 20px;
+            background: linear-gradient(to right, var(--darker), var(--dark));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: var(--accent);
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 22px;
+        }
+        
+        .user-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .user-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary);
+        }
+        
+        .user-content {
+            padding: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .user-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .user-status {
+            font-size: 14px;
+            color: var(--accent);
+            margin-top: 5px;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+        
+        .balance-title {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .currency {
+            font-size: 20px;
+            color: var(--accent);
+            margin-right: 5px;
+        }
+        
+        .bank-cards {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .bank-card {
+            min-width: 260px;
+            height: 160px;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-visa {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+        
+        .card-unionpay {
+            background: linear-gradient(135deg, #1e2a3a, #0f2027);
+        }
+        
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #FFD700, #C0C0C0);
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .card-chip::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%),
+                linear-gradient(0deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%);
+        }
+        
+        .card-number {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            font-size: 18px;
+            margin: 15px 0;
+        }
+        
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .card-holder, .card-expiry {
+            font-size: 14px;
+        }
+        
+        .card-logo {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+        
+        .action-btn i {
+            font-size: 24px;
+        }
+        
+        .transactions {
+            background: rgba(30, 30, 30, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+        
+        .transactions-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .transaction-list {
+            list-style: none;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.1);
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .transaction-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(138, 43, 226, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+        }
+        
+        .income {
+            color: #4CAF50;
+        }
+        
+        .expense {
+            color: #F44336;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 30, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            background-color: rgba(30, 30, 30, 0.8);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.cancel {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .modal-btn.send {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .modal-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* Стили для инвестиций */
         .investment-card {
             background: rgba(40, 40, 40, 0.8);
             border-radius: 15px;
@@ -49,9 +480,244 @@
     </style>
 </head>
 <body>
-    <!-- Весь предыдущий HTML-код остается без изменений до модального окна отправки -->
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-university"></i>
+                <div class="logo-text">LingoUng Bank</div>
+            </div>
+            <div class="user-selector">
+                <button class="user-btn active" id="damirBtn">Д</button>
+                <button class="user-btn" id="darinaBtn">Д</button>
+            </div>
+        </div>
+        
+        <!-- Дамир Кадыров -->
+        <div class="user-content" id="damirContent">
+            <div class="user-info">
+                <div class="user-avatar">ДК</div>
+                <div>
+                    <div class="user-name">Дамир Кадыров</div>
+                    <div class="user-status">Gold клиент</div>
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-title">Текущий баланс</div>
+                <div class="balance-amount"><span class="currency">₽</span> <span id="damirBalance">87,450.00</span></div>
+                <div class="balance-title">Доступно для снятия</div>
+            </div>
+            
+            <div class="bank-cards">
+                <div class="bank-card card-visa">
+                    <div class="card-chip"></div>
+                    <div class="card-number">4276 8100 1234 5678</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DAMIR KADYROV</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">05/27</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">VISA</div>
+                </div>
+                
+                <div class="bank-card card-unionpay">
+                    <div class="card-chip"></div>
+                    <div class="card-number">6212 3456 7890 1234</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DAMIR KADYROV</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">08/26</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">UnionPay</div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn" id="damirEarnBtn">
+                    <i class="fas fa-coins"></i>
+                    <span>Заработать</span>
+                </button>
+                <button class="action-btn" id="damirSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Отправить</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Перевести</span>
+                </button>
+                <button class="action-btn" id="damirInvestBtn">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Инвестиции</span>
+                </button>
+            </div>
+            
+            <div class="transactions">
+                <div class="transactions-title">
+                    <i class="fas fa-history"></i>
+                    <span>Последние операции</span>
+                </div>
+                <ul class="transaction-list" id="damirTransactions">
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div>Онлайн покупки</div>
+                                <div style="font-size: 12px; color: #aaa;">Сегодня, 14:30</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- ₽2,450.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div>
+                                <div>Зарплата</div>
+                                <div style="font-size: 12px; color: #aaa;">15 июля, 09:00</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+ ₽75,000.00</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Дарина Кадырова -->
+        <div class="user-content hidden" id="darinaContent">
+            <div class="user-info">
+                <div class="user-avatar">ДК</div>
+                <div>
+                    <div class="user-name">Дарина Кадырова</div>
+                    <div class="user-status">Platinum клиент</div>
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-title">Текущий баланс</div>
+                <div class="balance-amount"><span class="currency">₽</span> <span id="darinaBalance">124,843.00</span></div>
+                <div class="balance-title">Доступно для снятия</div>
+            </div>
+            
+            <div class="bank-cards">
+                <div class="bank-card card-visa">
+                    <div class="card-chip"></div>
+                    <div class="card-number">4276 8100 9850 3214</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DARINA KADYROVA</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">07/28</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">VISA</div>
+                </div>
+                
+                <div class="bank-card card-unionpay">
+                    <div class="card-chip"></div>
+                    <div class="card-number">6212 9876 5432 1098</div>
+                    <div class="card-details">
+                        <div>
+                            <div class="card-holder">DARINA KADYROVA</div>
+                        </div>
+                        <div>
+                            <div class="card-expiry">11/27</div>
+                        </div>
+                    </div>
+                    <div class="card-logo">UnionPay</div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn" id="darinaEarnBtn">
+                    <i class="fas fa-coins"></i>
+                    <span>Заработать</span>
+                </button>
+                <button class="action-btn" id="darinaSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Отправить</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Перевести</span>
+                </button>
+                <button class="action-btn" id="darinaInvestBtn">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Инвестиции</span>
+                </button>
+            </div>
+            
+            <div class="transactions">
+                <div class="transactions-title">
+                    <i class="fas fa-history"></i>
+                    <span>Последние операции</span>
+                </div>
+                <ul class="transaction-list" id="darinaTransactions">
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <div>
+                                <div>Фриланс проект</div>
+                                <div style="font-size: 12px; color: #aaa;">Сегодня, 14:30</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+ ₽5,200.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div>Онлайн магазин</div>
+                                <div style="font-size: 12px; color: #aaa;">Вчера, 09:15</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- ₽8,450.00</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
     
-    <!-- Добавляем новое модальное окно для инвестиций -->
+    <!-- Модальное окно для отправки денег -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content">
+            <div class="modal-title">Отправить деньги</div>
+            <div class="form-group">
+                <label for="recipient">Получатель</label>
+                <input type="text" id="recipient" placeholder="Введите имя получателя">
+            </div>
+            <div class="form-group">
+                <label for="amount">Сумма (₽)</label>
+                <input type="number" id="amount" placeholder="Введите сумму">
+            </div>
+            <div class="form-group">
+                <label for="card">С карты</label>
+                <select id="card">
+                    <option value="4276 8100 1234 5678">VISA 4276 8100 1234 5678</option>
+                    <option value="6212 3456 7890 1234">UnionPay 6212 3456 7890 1234</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelSend">Отмена</button>
+                <button class="modal-btn send" id="confirmSend">Отправить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для инвестиций -->
     <div class="modal" id="investModal">
         <div class="modal-content">
             <div class="modal-title">Инвестиционные возможности</div>
@@ -88,19 +754,145 @@
             </div>
         </div>
     </div>
+    
+    <div class="notification" id="notification">
+        + ₽1,000.00 зачислено на ваш счёт!
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Все предыдущие переменные и функции остаются
+            // Элементы интерфейса
+            const damirBtn = document.getElementById('damirBtn');
+            const darinaBtn = document.getElementById('darinaBtn');
+            const damirContent = document.getElementById('damirContent');
+            const darinaContent = document.getElementById('darinaContent');
+            const damirBalance = document.getElementById('damirBalance');
+            const darinaBalance = document.getElementById('darinaBalance');
+            const damirEarnBtn = document.getElementById('damirEarnBtn');
+            const darinaEarnBtn = document.getElementById('darinaEarnBtn');
+            const damirSendBtn = document.getElementById('damirSendBtn');
+            const darinaSendBtn = document.getElementById('darinaSendBtn');
+            const damirInvestBtn = document.getElementById('damirInvestBtn');
+            const darinaInvestBtn = document.getElementById('darinaInvestBtn');
+            const damirTransactions = document.getElementById('damirTransactions');
+            const darinaTransactions = document.getElementById('darinaTransactions');
+            const notification = document.getElementById('notification');
             
-            // Добавляем новые элементы для инвестиций
+            // Элементы модальных окон
+            const sendModal = document.getElementById('sendModal');
+            const cancelSend = document.getElementById('cancelSend');
+            const confirmSend = document.getElementById('confirmSend');
+            const recipientInput = document.getElementById('recipient');
+            const amountInput = document.getElementById('amount');
+            const cardSelect = document.getElementById('card');
+            
             const investModal = document.getElementById('investModal');
             const cancelInvest = document.getElementById('cancelInvest');
-            const damirInvestBtn = document.querySelector('#damirContent .action-btn:nth-child(4)');
-            const darinaInvestBtn = document.querySelector('#darinaContent .action-btn:nth-child(4)');
             const investmentCards = document.querySelectorAll('.investment-card');
             
-            // Функция для инвестирования
+            // Текущий активный пользователь
+            let currentUser = 'damir';
+            
+            // Форматирование числа
+            function formatNumber(num) {
+                return num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+            
+            // Парсинг числа
+            function parseNumber(str) {
+                return parseFloat(str.replace(/,/g, ''));
+            }
+            
+            // Показать уведомление
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Добавить транзакцию
+            function addTransaction(list, type, amount, description) {
+                const now = new Date();
+                const dateString = now.toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+                const timeString = now.toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const transaction = document.createElement('li');
+                transaction.className = 'transaction-item';
+                
+                const icon = type === 'income' ? 'fa-coins' : 'fa-shopping-cart';
+                const amountClass = type === 'income' ? 'income' : 'expense';
+                const amountSign = type === 'income' ? '+' : '-';
+                
+                transaction.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-icon">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div>
+                            <div>${description}</div>
+                            <div style="font-size: 12px; color: #aaa;">${dateString}, ${timeString}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">${amountSign} ₽${formatNumber(amount)}</div>
+                `;
+                
+                list.insertBefore(transaction, list.firstChild);
+            }
+            
+            // Заработать деньги
+            function earnMoney(balanceElement, transactionsList) {
+                const amount = 1000;
+                const currentBalance = parseNumber(balanceElement.textContent);
+                const newBalance = currentBalance + amount;
+                
+                balanceElement.textContent = formatNumber(newBalance);
+                addTransaction(transactionsList, 'income', amount, 'Заработок в приложении');
+                showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счёт!`);
+            }
+            
+            // Отправить деньги
+            function sendMoney(balanceElement, transactionsList) {
+                const amount = parseFloat(amountInput.value);
+                const recipient = recipientInput.value.trim();
+                
+                if (!recipient || !amount) {
+                    showNotification('Заполните все поля!');
+                    return;
+                }
+                
+                const currentBalance = parseNumber(balanceElement.textContent);
+                
+                if (amount > currentBalance) {
+                    showNotification('Недостаточно средств на счете!');
+                    return;
+                }
+                
+                if (amount <= 0) {
+                    showNotification('Сумма должна быть больше нуля!');
+                    return;
+                }
+                
+                const newBalance = currentBalance - amount;
+                balanceElement.textContent = formatNumber(newBalance);
+                addTransaction(transactionsList, 'expense', amount, `Перевод ${recipient}`);
+                showNotification(`- ₽${formatNumber(amount)} отправлено ${recipient}`);
+                
+                // Закрываем модальное окно
+                sendModal.style.display = 'none';
+                recipientInput.value = '';
+                amountInput.value = '';
+            }
+            
+            // Инвестировать деньги
             function investMoney(balanceElement, transactionsList, amount, returnRate) {
                 const currentBalance = parseNumber(balanceElement.textContent);
                 
@@ -128,7 +920,54 @@
                 return true;
             }
             
-            // Обработчики для кнопок инвестиций
+            // Переключение пользователей
+            damirBtn.addEventListener('click', function() {
+                damirBtn.classList.add('active');
+                darinaBtn.classList.remove('active');
+                damirContent.classList.remove('hidden');
+                darinaContent.classList.add('hidden');
+                currentUser = 'damir';
+                
+                // Обновляем список карт для Дамира
+                cardSelect.innerHTML = `
+                    <option value="4276 8100 1234 5678">VISA 4276 8100 1234 5678</option>
+                    <option value="6212 3456 7890 1234">UnionPay 6212 3456 7890 1234</option>
+                `;
+            });
+            
+            darinaBtn.addEventListener('click', function() {
+                darinaBtn.classList.add('active');
+                damirBtn.classList.remove('active');
+                darinaContent.classList.remove('hidden');
+                damirContent.classList.add('hidden');
+                currentUser = 'darina';
+                
+                // Обновляем список карт для Дарины
+                cardSelect.innerHTML = `
+                    <option value="4276 8100 9850 3214">VISA 4276 8100 9850 3214</option>
+                    <option value="6212 9876 5432 1098">UnionPay 6212 9876 5432 1098</option>
+                `;
+            });
+            
+            // Кнопки заработка
+            damirEarnBtn.addEventListener('click', function() {
+                earnMoney(damirBalance, damirTransactions);
+            });
+            
+            darinaEarnBtn.addEventListener('click', function() {
+                earnMoney(darinaBalance, darinaTransactions);
+            });
+            
+            // Кнопки отправки денег
+            damirSendBtn.addEventListener('click', function() {
+                sendModal.style.display = 'flex';
+            });
+            
+            darinaSendBtn.addEventListener('click', function() {
+                sendModal.style.display = 'flex';
+            });
+            
+            // Кнопки инвестиций
             damirInvestBtn.addEventListener('click', function() {
                 investModal.style.display = 'flex';
             });
@@ -137,7 +976,22 @@
                 investModal.style.display = 'flex';
             });
             
-            // Обработчик закрытия модального окна инвестиций
+            // Кнопки в модальном окне отправки
+            cancelSend.addEventListener('click', function() {
+                sendModal.style.display = 'none';
+                recipientInput.value = '';
+                amountInput.value = '';
+            });
+            
+            confirmSend.addEventListener('click', function() {
+                if (currentUser === 'damir') {
+                    sendMoney(damirBalance, damirTransactions);
+                } else {
+                    sendMoney(darinaBalance, darinaTransactions);
+                }
+            });
+            
+            // Кнопки в модальном окне инвестиций
             cancelInvest.addEventListener('click', function() {
                 investModal.style.display = 'none';
             });
@@ -163,8 +1017,19 @@
                 });
             });
             
-            // Все остальные обработчики событий остаются без изменений
+            // Закрытие модальных окон при клике вне их
+            window.addEventListener('click', function(event) {
+                if (event.target === sendModal) {
+                    sendModal.style.display = 'none';
+                    recipientInput.value = '';
+                    amountInput.value = '';
+                }
+                
+                if (event.target === investModal) {
+                    investModal.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
-</html>
+    </html>
