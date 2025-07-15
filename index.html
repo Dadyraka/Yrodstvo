@@ -188,6 +188,43 @@
             color: #aaa;
             margin-top: 5px;
         }
+        #historyList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(185, 103, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(185, 103, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .history-details {
+            flex-grow: 1;
+        }
+        .history-amount.income {
+            color: #4CAF50;
+        }
+        .history-amount.expense {
+            color: #F44336;
+        }
+        .history-date {
+            font-size: 12px;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -291,7 +328,7 @@
                 <h3 class="modal-title"><i class="fas fa-history"></i> История операций</h3>
                 <button class="close-btn" id="closeHistoryModal">&times;</button>
             </div>
-            <div id="historyList" style="max-height: 400px; overflow-y: auto;">
+            <div id="historyList">
                 <!-- История будет добавляться сюда -->
             </div>
         </div>
@@ -300,65 +337,98 @@
     <div class="notification" id="notification"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Элементы интерфейса
-            const balanceElement = document.getElementById('balance');
-            const earnBtn = document.getElementById('earnBtn');
-            const sendBtn = document.getElementById('sendBtn');
-            const exchangeBtn = document.getElementById('exchangeBtn');
-            const historyBtn = document.getElementById('historyBtn');
-            const sendModal = document.getElementById('sendModal');
-            const exchangeModal = document.getElementById('exchangeModal');
-            const historyModal = document.getElementById('historyModal');
-            const closeSendModal = document.getElementById('closeSendModal');
-            const closeExchangeModal = document.getElementById('closeExchangeModal');
-            const closeHistoryModal = document.getElementById('closeHistoryModal');
-            const sendForm = document.getElementById('sendForm');
-            const exchangeForm = document.getElementById('exchangeForm');
-            const fromAmount = document.getElementById('fromAmount');
-            const fromCurrency = document.getElementById('fromCurrency');
-            const toCurrency = document.getElementById('toCurrency');
-            const result = document.getElementById('result');
-            const convertBtn = document.getElementById('convertBtn');
-            const exchangeRateText = document.getElementById('exchangeRateText');
-            const historyList = document.getElementById('historyList');
-            const notification = document.getElementById('notification');
-            
-            // Данные приложения
-            let balance = 50000;
-            let history = [];
-            const rates = {
+        // Инициализация данных приложения
+        const app = {
+            balance: 50000,
+            history: [],
+            rates: {
                 RUB: { USD: 0.011, EUR: 0.010 },
                 USD: { RUB: 90.5, EUR: 0.92 },
                 EUR: { RUB: 98.3, USD: 1.09 }
-            };
+            },
             
-            // Инициализация приложения
-            updateBalance();
-            updateExchangeRate();
+            init: function() {
+                // Инициализация элементов
+                this.balanceElement = document.getElementById('balance');
+                this.earnBtn = document.getElementById('earnBtn');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.exchangeBtn = document.getElementById('exchangeBtn');
+                this.historyBtn = document.getElementById('historyBtn');
+                this.sendModal = document.getElementById('sendModal');
+                this.exchangeModal = document.getElementById('exchangeModal');
+                this.historyModal = document.getElementById('historyModal');
+                this.closeSendModal = document.getElementById('closeSendModal');
+                this.closeExchangeModal = document.getElementById('closeExchangeModal');
+                this.closeHistoryModal = document.getElementById('closeHistoryModal');
+                this.sendForm = document.getElementById('sendForm');
+                this.exchangeForm = document.getElementById('exchangeForm');
+                this.fromAmount = document.getElementById('fromAmount');
+                this.fromCurrency = document.getElementById('fromCurrency');
+                this.toCurrency = document.getElementById('toCurrency');
+                this.result = document.getElementById('result');
+                this.convertBtn = document.getElementById('convertBtn');
+                this.exchangeRateText = document.getElementById('exchangeRateText');
+                this.historyList = document.getElementById('historyList');
+                this.notification = document.getElementById('notification');
+                
+                // Начальная настройка
+                this.updateBalance();
+                this.updateExchangeRate();
+                this.setupEventListeners();
+                
+                // Добавляем начальные данные в историю
+                this.addHistory('earn', 50000, 'Начальный баланс');
+            },
             
-            // Функции
-            function formatNumber(num) {
+            setupEventListeners: function() {
+                // Кнопки в основном интерфейсе
+                this.earnBtn.addEventListener('click', this.handleEarn.bind(this));
+                this.sendBtn.addEventListener('click', this.showSendModal.bind(this));
+                this.exchangeBtn.addEventListener('click', this.showExchangeModal.bind(this));
+                this.historyBtn.addEventListener('click', this.showHistoryModal.bind(this));
+                
+                // Кнопки закрытия модальных окон
+                this.closeSendModal.addEventListener('click', this.hideSendModal.bind(this));
+                this.closeExchangeModal.addEventListener('click', this.hideExchangeModal.bind(this));
+                this.closeHistoryModal.addEventListener('click', this.hideHistoryModal.bind(this));
+                
+                // Форма отправки
+                this.sendForm.addEventListener('submit', this.handleSend.bind(this));
+                
+                // Обменник валют
+                this.fromAmount.addEventListener('input', this.convertCurrency.bind(this));
+                this.fromCurrency.addEventListener('change', this.handleCurrencyChange.bind(this));
+                this.toCurrency.addEventListener('change', this.handleCurrencyChange.bind(this));
+                this.convertBtn.addEventListener('click', this.handleConvert.bind(this));
+                
+                // Закрытие модальных окон при клике вне их
+                window.addEventListener('click', this.handleOutsideClick.bind(this));
+            },
+            
+            // Функции для работы с балансом
+            formatNumber: function(num) {
                 return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
+            },
             
-            function parseNumber(str) {
+            parseNumber: function(str) {
                 return parseFloat(str.replace(/,/g, ''));
-            }
+            },
             
-            function updateBalance() {
-                balanceElement.textContent = formatNumber(balance);
-            }
+            updateBalance: function() {
+                this.balanceElement.textContent = this.formatNumber(this.balance);
+            },
             
-            function showNotification(message) {
-                notification.textContent = message;
-                notification.classList.add('show');
+            // Функции для уведомлений
+            showNotification: function(message) {
+                this.notification.textContent = message;
+                this.notification.classList.add('show');
                 setTimeout(() => {
-                    notification.classList.remove('show');
+                    this.notification.classList.remove('show');
                 }, 3000);
-            }
+            },
             
-            function addHistory(type, amount, description, details = {}) {
+            // Функции для истории операций
+            addHistory: function(type, amount, description, details = {}) {
                 const transaction = {
                     id: Date.now(),
                     type,
@@ -367,197 +437,200 @@
                     date: new Date(),
                     details
                 };
-                history.unshift(transaction);
-                renderHistory();
+                this.history.unshift(transaction);
+                this.renderHistory();
                 return transaction;
-            }
+            },
             
-            function renderHistory() {
-                historyList.innerHTML = '';
-                history.forEach(transaction => {
+            renderHistory: function() {
+                this.historyList.innerHTML = '';
+                this.history.forEach(transaction => {
                     const item = document.createElement('div');
-                    item.style.padding = '10px';
-                    item.style.borderBottom = '1px solid rgba(185, 103, 255, 0.1)';
-                    item.style.display = 'flex';
-                    item.style.justifyContent = 'space-between';
+                    item.className = 'history-item';
                     
-                    const icon = transaction.type === 'earn' ? 'fa-coins' : 
-                                transaction.type === 'send' ? 'fa-paper-plane' : 
-                                transaction.type === 'exchange' ? 'fa-exchange-alt' : 'fa-question';
+                    const iconClass = {
+                        'earn': 'fa-coins',
+                        'send': 'fa-paper-plane',
+                        'exchange': 'fa-exchange-alt'
+                    }[transaction.type] || 'fa-question';
                     
-                    const amountClass = transaction.type === 'earn' ? 'color: #4CAF50;' : 
-                                      transaction.type === 'send' ? 'color: #F44336;' : '';
+                    const amountClass = transaction.type === 'earn' ? 'income' : 
+                                      transaction.type === 'send' ? 'expense' : '';
                     
                     const amountSign = transaction.type === 'earn' ? '+' : '-';
+                    const currency = transaction.type === 'exchange' ? 
+                                   (transaction.details.fromCurrency || '') : '₽';
                     
                     item.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <i class="fas ${icon}" style="color: #b967ff;"></i>
-                            <div>
+                        <div style="display: flex; align-items: center;">
+                            <div class="history-icon">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <div class="history-details">
                                 <div>${transaction.description}</div>
-                                <div style="font-size: 12px; color: #aaa;">
+                                <div class="history-date">
                                     ${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString()}
                                 </div>
                             </div>
                         </div>
-                        <div style="${amountClass} font-weight: bold;">
-                            ${amountSign}${transaction.type === 'exchange' ? '' : '₽'}${formatNumber(transaction.amount)}
+                        <div class="history-amount ${amountClass}">
+                            ${amountSign}${currency}${this.formatNumber(transaction.amount)}
                         </div>
                     `;
-                    historyList.appendChild(item);
+                    this.historyList.appendChild(item);
                 });
-            }
+            },
             
-            function updateExchangeRate() {
-                const from = fromCurrency.value;
-                const to = toCurrency.value;
+            // Функции для обменника валют
+            updateExchangeRate: function() {
+                const from = this.fromCurrency.value;
+                const to = this.toCurrency.value;
                 if (from === to) {
-                    exchangeRateText.textContent = '';
+                    this.exchangeRateText.textContent = '';
                     return;
                 }
-                const rate = rates[from][to];
-                const reverseRate = rates[to][from];
-                exchangeRateText.textContent = `1 ${from} = ${rate.toFixed(4)} ${to} | 1 ${to} = ${reverseRate.toFixed(4)} ${from}`;
-            }
+                const rate = this.rates[from][to];
+                const reverseRate = this.rates[to][from];
+                this.exchangeRateText.textContent = `1 ${from} = ${rate.toFixed(4)} ${to} | 1 ${to} = ${reverseRate.toFixed(4)} ${from}`;
+            },
             
-            function convertCurrency() {
-                const amount = parseFloat(fromAmount.value);
-                if (isNaN(amount) || amount <= 0) {
-                    result.textContent = '0';
+            convertCurrency: function() {
+                const amount = parseFloat(this.fromAmount.value);
+                if (isNaN(amount) {
+                    this.result.textContent = '0';
                     return;
                 }
                 
-                const from = fromCurrency.value;
-                const to = toCurrency.value;
+                const from = this.fromCurrency.value;
+                const to = this.toCurrency.value;
                 
                 if (from === to) {
-                    result.textContent = amount.toFixed(2);
+                    this.result.textContent = amount.toFixed(2);
                     return;
                 }
                 
-                const convertedAmount = amount * rates[from][to];
-                result.textContent = convertedAmount.toFixed(2);
-            }
+                const convertedAmount = amount * this.rates[from][to];
+                this.result.textContent = convertedAmount.toFixed(2);
+            },
             
             // Обработчики событий
-            earnBtn.addEventListener('click', function() {
+            handleEarn: function() {
                 const amount = 1000;
-                balance += amount;
-                updateBalance();
-                addHistory('earn', amount, 'Заработок в приложении');
-                showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счет`);
-            });
+                this.balance += amount;
+                this.updateBalance();
+                this.addHistory('earn', amount, 'Заработок в приложении');
+                this.showNotification(`+ ₽${this.formatNumber(amount)} зачислено на ваш счет`);
+            },
             
-            sendBtn.addEventListener('click', function() {
-                sendModal.classList.add('active');
-            });
+            showSendModal: function() {
+                this.sendModal.classList.add('active');
+            },
             
-            exchangeBtn.addEventListener('click', function() {
-                exchangeModal.classList.add('active');
-            });
+            hideSendModal: function() {
+                this.sendModal.classList.remove('active');
+            },
             
-            historyBtn.addEventListener('click', function() {
-                historyModal.classList.add('active');
-            });
+            showExchangeModal: function() {
+                this.exchangeModal.classList.add('active');
+            },
             
-            closeSendModal.addEventListener('click', function() {
-                sendModal.classList.remove('active');
-            });
+            hideExchangeModal: function() {
+                this.exchangeModal.classList.remove('active');
+            },
             
-            closeExchangeModal.addEventListener('click', function() {
-                exchangeModal.classList.remove('active');
-            });
+            showHistoryModal: function() {
+                this.historyModal.classList.add('active');
+            },
             
-            closeHistoryModal.addEventListener('click', function() {
-                historyModal.classList.remove('active');
-            });
+            hideHistoryModal: function() {
+                this.historyModal.classList.remove('active');
+            },
             
-            sendForm.addEventListener('submit', function(e) {
+            handleSend: function(e) {
                 e.preventDefault();
                 
-                const recipient = document.getElementById('recipient').value;
-                const amount = parseFloat(document.getElementById('sendAmount').value);
+                const recipient = this.recipient.value;
+                const amount = parseFloat(this.sendAmount.value);
                 
-                if (isNaN(amount) {
-                    showNotification('Введите корректную сумму');
+                if (isNaN(amount)) {
+                    this.showNotification('Введите корректную сумму');
                     return;
                 }
                 
                 if (amount <= 0) {
-                    showNotification('Сумма должна быть больше нуля');
+                    this.showNotification('Сумма должна быть больше нуля');
                     return;
                 }
                 
-                if (amount > balance) {
-                    showNotification('Недостаточно средств на счете');
+                if (amount > this.balance) {
+                    this.showNotification('Недостаточно средств на счете');
                     return;
                 }
                 
-                balance -= amount;
-                updateBalance();
-                addHistory('send', amount, 'Перевод средств', { recipient });
-                showNotification(`Перевод ₽${formatNumber(amount)} на карту ${recipient} выполнен`);
+                this.balance -= amount;
+                this.updateBalance();
+                this.addHistory('send', amount, 'Перевод средств', { recipient });
+                this.showNotification(`Перевод ₽${this.formatNumber(amount)} на карту ${recipient} выполнен`);
                 
-                sendForm.reset();
-                sendModal.classList.remove('active');
-            });
+                this.sendForm.reset();
+                this.hideSendModal();
+            },
             
-            fromAmount.addEventListener('input', convertCurrency);
-            fromCurrency.addEventListener('change', function() {
-                updateExchangeRate();
-                convertCurrency();
-            });
-            toCurrency.addEventListener('change', function() {
-                updateExchangeRate();
-                convertCurrency();
-            });
+            handleCurrencyChange: function() {
+                this.updateExchangeRate();
+                this.convertCurrency();
+            },
             
-            convertBtn.addEventListener('click', function() {
-                const amount = parseFloat(fromAmount.value);
-                if (isNaN(amount) {
-                    showNotification('Введите сумму для обмена');
+            handleConvert: function() {
+                const amount = parseFloat(this.fromAmount.value);
+                if (isNaN(amount)) {
+                    this.showNotification('Введите сумму для обмена');
                     return;
                 }
                 
                 if (amount <= 0) {
-                    showNotification('Сумма должна быть больше нуля');
+                    this.showNotification('Сумма должна быть больше нуля');
                     return;
                 }
                 
-                const from = fromCurrency.value;
-                const to = toCurrency.value;
+                const from = this.fromCurrency.value;
+                const to = this.toCurrency.value;
                 
                 if (from === to) {
-                    showNotification('Выберите разные валюты для обмена');
+                    this.showNotification('Выберите разные валюты для обмена');
                     return;
                 }
                 
-                const convertedAmount = amount * rates[from][to];
-                addHistory('exchange', amount, `Обмен ${from} → ${to}`, {
+                const convertedAmount = amount * this.rates[from][to];
+                this.addHistory('exchange', amount, `Обмен ${from} → ${to}`, {
                     fromAmount: amount,
                     fromCurrency: from,
                     toAmount: convertedAmount,
                     toCurrency: to
                 });
                 
-                showNotification(`Обмен ${amount} ${from} на ${convertedAmount.toFixed(2)} ${to} выполнен`);
-                exchangeForm.reset();
-                result.textContent = '0';
-                exchangeModal.classList.remove('active');
-            });
+                this.showNotification(`Обмен ${amount} ${from} на ${convertedAmount.toFixed(2)} ${to} выполнен`);
+                this.exchangeForm.reset();
+                this.result.textContent = '0';
+                this.hideExchangeModal();
+            },
             
-            // Закрытие модальных окон при клике вне их
-            window.addEventListener('click', function(e) {
-                if (e.target === sendModal) {
-                    sendModal.classList.remove('active');
+            handleOutsideClick: function(e) {
+                if (e.target === this.sendModal) {
+                    this.hideSendModal();
                 }
-                if (e.target === exchangeModal) {
-                    exchangeModal.classList.remove('active');
+                if (e.target === this.exchangeModal) {
+                    this.hideExchangeModal();
                 }
-                if (e.target === historyModal) {
-                    historyModal.classList.remove('active');
+                if (e.target === this.historyModal) {
+                    this.hideHistoryModal();
                 }
-            });
+            }
+        };
+        
+        // Инициализация приложения после загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            app.init();
         });
     </script>
 </body>
