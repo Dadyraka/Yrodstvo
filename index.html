@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LingoUng Bank - Дарина Кадорова</title>
+    <title>Банковский портал | KRW</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,35 +14,26 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a0a2e, #2d0b4e, #4a1c6d);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
-            color: #fff;
-            overflow-x: hidden;
         }
         
         .container {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
-            border-radius: 25px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .header {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 25px 30px;
+        header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
         }
         
         .logo {
@@ -51,777 +42,510 @@
             gap: 15px;
         }
         
-        .logo-icon {
-            font-size: 32px;
-            color: #b967ff;
+        .logo i {
+            font-size: 2.5rem;
+            color: #e63946;
         }
         
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
         }
         
-        .bank-city {
-            font-size: 14px;
-            color: #c5a3ff;
-            margin-top: 3px;
+        .logo span {
+            color: #e63946;
         }
         
-        .user {
+        .user-switcher {
+            position: relative;
+        }
+        
+        .current-user {
             display: flex;
             align-items: center;
             gap: 10px;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        .user-photo {
-            width: 50px;
-            height: 50px;
+        .current-user:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #b967ff, #ff5ef3);
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(185, 103, 255, 0.5);
+            color: white;
+            font-weight: bold;
         }
         
-        .user-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .user-info {
-            text-align: right;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            font-size: 16px;
-            color: #e8d7ff;
-        }
-        
-        .user-status {
-            font-size: 12px;
-            color: #b967ff;
-            margin-top: 3px;
-        }
-        
-        .balance-card {
-            background: linear-gradient(135deg, #2c1052, #1a0835);
-            margin: 30px;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .balance-card::before {
-            content: "";
+        .user-list {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(185, 103, 255, 0.15) 0%, rgba(185, 103, 255, 0) 70%);
-            transform: rotate(30deg);
+            top: 100%;
+            right: 0;
+            width: 280px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+            z-index: 100;
+        }
+        
+        .user-list.active {
+            display: block;
+        }
+        
+        .user-list-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-list-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-list-item.active {
+            background: #e7f5ff;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f5;
         }
         
         .card-title {
-            color: #c5a3ff;
-            font-size: 16px;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            color: #1a2a6c;
         }
         
-        .balance-amount {
-            font-size: 48px;
+        .balance {
+            font-size: 2.8rem;
             font-weight: 700;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(185, 103, 255, 0.5);
+            margin: 20px 0;
+            color: #e63946;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
         }
         
         .currency {
-            font-size: 24px;
-            color: #b967ff;
+            font-size: 1.2rem;
+            color: #495057;
+            vertical-align: super;
+            margin-right: 5px;
         }
         
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            padding: 0 30px 20px;
-            justify-content: center;
+        .account-details {
+            margin-top: 25px;
         }
         
-        .action-btn {
-            flex: 1;
-            max-width: 200px;
-            padding: 18px 20px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .action-btn i {
-            font-size: 20px;
-        }
-        
-        .earn-btn {
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
-            color: #fff;
-        }
-        
-        .send-btn {
-            background: linear-gradient(to right, #ff5ef3, #ff6b9c);
-            color: #fff;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(185, 103, 255, 0.6);
-        }
-        
-        .action-btn:active {
-            transform: translateY(1px);
-        }
-        
-        .bank-card {
-            background: linear-gradient(135deg, #4a1c6d, #2d0b4e);
-            margin: 0 30px 30px;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .bank-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 10% 80%, rgba(255, 94, 243, 0.1) 0%, transparent 30%);
-        }
-        
-        .card-chip {
-            width: 50px;
-            height: 40px;
-            background: linear-gradient(135deg, #d9c7f0, #b88ad9);
-            border-radius: 8px;
-            margin-bottom: 25px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card-chip::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%),
-                linear-gradient(0deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%);
-        }
-        
-        .card-number {
-            font-size: 22px;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-        
-        .card-details {
+        .detail-row {
             display: flex;
             justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f5;
         }
         
-        .card-holder, .card-expiry {
-            font-size: 14px;
-            color: #e8d7ff;
+        .detail-row:last-child {
+            border-bottom: none;
         }
         
-        .card-label {
-            font-size: 10px;
-            color: #c5a3ff;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .detail-label {
+            color: #6c757d;
+            font-weight: 500;
         }
         
-        .card-logo {
-            position: absolute;
-            bottom: 25px;
-            right: 25px;
-            font-size: 32px;
-            color: #fff;
-            font-weight: bold;
-            font-style: italic;
-            text-shadow: 0 0 10px rgba(185, 103, 255, 0.8);
+        .detail-value {
+            font-weight: 600;
+            color: #212529;
+            text-align: right;
         }
         
-        .transaction-history {
-            background: rgba(0, 0, 0, 0.25);
-            margin: 0 30px 30px;
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .history-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #e8d7ff;
-        }
-        
-        .history-list {
-            list-style: none;
-        }
-        
-        .history-item {
+        .recent-transactions .transaction {
             display: flex;
             justify-content: space-between;
             padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid #f1f3f5;
         }
         
-        .history-item:last-child {
+        .transaction:last-child {
             border-bottom: none;
         }
         
         .transaction-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
         
         .transaction-icon {
             width: 40px;
             height: 40px;
-            border-radius: 12px;
-            background: rgba(185, 103, 255, 0.2);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-        }
-        
-        .transaction-type {
-            font-weight: 500;
-        }
-        
-        .transaction-date {
-            color: #c5a3ff;
-            font-size: 13px;
-            margin-top: 3px;
+            background: #e7f5ff;
+            color: #1c7ed6;
         }
         
         .transaction-amount {
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
         
         .income {
-            color: #b967ff;
+            color: #2b8a3e;
         }
         
         .expense {
-            color: #ff6b9c;
+            color: #c92a2a;
         }
         
-        .send-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        .flag {
+            font-size: 2rem;
+            margin-right: 10px;
         }
         
-        .send-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #2c1052, #1a0835);
-            width: 90%;
-            max-width: 400px;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            position: relative;
-            border: 1px solid rgba(185, 103, 255, 0.3);
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
-            color: #c5a3ff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .close-modal:hover {
-            color: #ff5ef3;
-            transform: rotate(90deg);
-        }
-        
-        .modal-title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #c5a3ff;
-            font-weight: 500;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 14px 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(185, 103, 255, 0.3);
-            background: rgba(0, 0, 0, 0.4);
-            color: #fff;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #b967ff;
-            box-shadow: 0 0 10px rgba(185, 103, 255, 0.5);
-        }
-        
-        .submit-btn {
-            background: linear-gradient(to right, #b967ff, #ff5ef3);
-            color: #fff;
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
             border: none;
-            padding: 16px;
-            font-size: 18px;
+            border-radius: 50px;
             font-weight: 600;
-            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(185, 103, 255, 0.4);
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
-        .submit-btn:hover {
+        .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(185, 103, 255, 0.6);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #b967ff;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-weight: 500;
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(185, 103, 255, 0.3);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            z-index: 1001;
+        .btn:active {
+            transform: translateY(1px);
         }
         
-        .notification.show {
-            transform: translateX(0);
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
         
-        .footer {
+        footer {
             text-align: center;
-            padding: 20px;
-            font-size: 14px;
-            color: rgba(200, 170, 230, 0.7);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            color: white;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
         
-        @media (max-width: 480px) {
-            .header {
-                padding: 20px;
-            }
-            
-            .logo-text {
-                font-size: 20px;
-            }
-            
-            .balance-amount {
-                font-size: 36px;
-            }
-            
-            .balance-card, .transaction-history, .bank-card {
-                margin: 20px;
-            }
-            
-            .action-buttons {
+        @media (max-width: 768px) {
+            header {
                 flex-direction: column;
-                align-items: center;
+                gap: 20px;
             }
             
-            .action-btn {
-                max-width: 100%;
+            .user-switcher {
                 width: 100%;
+            }
+            
+            .user-list {
+                width: 100%;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .balance {
+                font-size: 2.2rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <header>
             <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-university"></i>
-                </div>
-                <div>
-                    <div class="logo-text">LingoUng Bank</div>
-                    <div class="bank-city">Сеул, Южная Корея</div>
-                </div>
+                <i class="fas fa-university"></i>
+                <h1>Global<span>Bank</span> KRW</h1>
             </div>
-            <div class="user">
-                <div class="user-info">
-                    <div class="user-name">Дарина Кадорова</div>
-                    <div class="user-status">Platinum клиент</div>
+            
+            <div class="user-switcher">
+                <div class="current-user" id="current-user">
+                    <div class="user-avatar">ДК</div>
+                    <div>
+                        <div class="user-name">Дамир Кадыров</div>
+                        <div class="user-role">Премиум клиент</div>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="user-photo">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" alt="Фото Дарины">
-                </div>
-            </div>
-        </div>
-        
-        <div class="balance-card">
-            <div class="card-title">Ваш баланс</div>
-            <div class="balance-amount"><span class="currency">₽</span> <span id="balance">124,843.00</span></div>
-            <div class="card-title">Доступно для снятия</div>
-        </div>
-        
-        <div class="action-buttons">
-            <button class="action-btn earn-btn" id="earnBtn">
-                <i class="fas fa-coins"></i> Заработать
-            </button>
-            <button class="action-btn send-btn" id="sendBtn">
-                <i class="fas fa-paper-plane"></i> Отправить
-            </button>
-        </div>
-        
-        <div class="bank-card">
-            <div class="card-chip"></div>
-            <div class="card-number">4276 8100 9850 3214</div>
-            <div class="card-details">
-                <div>
-                    <div class="card-label">Владелец карты</div>
-                    <div class="card-holder">DARINA KADOROVA</div>
-                </div>
-                <div>
-                    <div class="card-label">Срок действия</div>
-                    <div class="card-expiry">07/28</div>
-                </div>
-            </div>
-            <div class="card-logo">VISA</div>
-        </div>
-        
-        <div class="transaction-history">
-            <div class="history-title">
-                <i class="fas fa-history"></i> История операций
-            </div>
-            <ul class="history-list" id="historyList">
-                <li class="history-item">
-                    <div class="transaction-info">
-                        <div class="transaction-icon">
-                            <i class="fas fa-laptop"></i>
-                        </div>
+                
+                <div class="user-list" id="user-list">
+                    <div class="user-list-item active" data-user="damir">
+                        <div class="user-avatar">ДК</div>
                         <div>
-                            <div class="transaction-type">Фриланс проект</div>
-                            <div class="transaction-date">Сегодня, 14:30</div>
+                            <div class="user-name">Дамир Кадыров</div>
+                            <div class="user-email">damir.kadyrov@example.com</div>
                         </div>
                     </div>
-                    <div class="transaction-amount income">+ ₽5,200.00</div>
-                </li>
-                <li class="history-item">
-                    <div class="transaction-info">
-                        <div class="transaction-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
+                    <div class="user-list-item" data-user="anna">
+                        <div class="user-avatar" style="background:linear-gradient(45deg, #a1c4fd, #c2e9fb);">АИ</div>
                         <div>
-                            <div class="transaction-type">Онлайн магазин</div>
-                            <div class="transaction-date">Вчера, 09:15</div>
+                            <div class="user-name">Анна Иванова</div>
+                            <div class="user-email">anna.ivanova@example.com</div>
                         </div>
                     </div>
-                    <div class="transaction-amount expense">- ₽8,450.00</div>
-                </li>
-                <li class="history-item">
-                    <div class="transaction-info">
-                        <div class="transaction-icon">
-                            <i class="fas fa-coffee"></i>
-                        </div>
+                    <div class="user-list-item" data-user="sergey">
+                        <div class="user-avatar" style="background:linear-gradient(45deg, #ffecd2, #fcb69f);">СП</div>
                         <div>
-                            <div class="transaction-type">Coffee Like</div>
-                            <div class="transaction-date">12 июля, 18:40</div>
+                            <div class="user-name">Сергей Петров</div>
+                            <div class="user-email">sergey.petrov@example.com</div>
                         </div>
                     </div>
-                    <div class="transaction-amount expense">- ₽380.00</div>
-                </li>
-                <li class="history-item">
-                    <div class="transaction-info">
-                        <div class="transaction-icon">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
+                    <div class="user-list-item" data-user="ekaterina">
+                        <div class="user-avatar" style="background:linear-gradient(45deg, #84fab0, #8fd3f4);">ЕС</div>
                         <div>
-                            <div class="transaction-type">Перевод от клиента</div>
-                            <div class="transaction-date">10 июля, 11:20</div>
+                            <div class="user-name">Екатерина Сидорова</div>
+                            <div class="user-email">ekaterina.s@example.com</div>
                         </div>
                     </div>
-                    <div class="transaction-amount income">+ ₽12,000.00</div>
-                </li>
-            </ul>
+                </div>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Обзор счета</h2>
+                    <div class="currency-flag">
+                        <span class="flag">🇰🇷</span>
+                        <span>KRW</span>
+                    </div>
+                </div>
+                
+                <div class="balance">
+                    <span class="currency">₩</span> 42,689,500
+                </div>
+                
+                <div class="account-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Номер счета</span>
+                        <span class="detail-value">KRW-40817810570001234567</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Банк</span>
+                        <span class="detail-value">ПАО "Сбербанк"</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">БИК</span>
+                        <span class="detail-value">044525225</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Валюта счета</span>
+                        <span class="detail-value">Корейские воны (KRW)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Статус счета</span>
+                        <span class="detail-value" style="color:#2b8a3e;font-weight:700;">Активен</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Последние операции</h2>
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                
+                <div class="recent-transactions">
+                    <div class="transaction">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div class="transaction-name">Samsung Store</div>
+                                <div class="transaction-date">15 июля 2025</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">-₩ 1,250,000</div>
+                    </div>
+                    
+                    <div class="transaction">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <div>
+                                <div class="transaction-name">Korean Air</div>
+                                <div class="transaction-date">14 июля 2025</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">-₩ 3,780,000</div>
+                    </div>
+                    
+                    <div class="transaction">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <div class="transaction-name">Зарплата</div>
+                                <div class="transaction-date">10 июля 2025</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+₩ 15,000,000</div>
+                    </div>
+                    
+                    <div class="transaction">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div>
+                                <div class="transaction-name">Перевод от И.П. Ким</div>
+                                <div class="transaction-date">8 июля 2025</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+₩ 5,320,000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Быстрые действия</h2>
+                    <i class="fas fa-bolt"></i>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn"><i class="fas fa-exchange-alt"></i> Перевод</button>
+                    <button class="btn"><i class="fas fa-money-bill-wave"></i> Оплата</button>
+                    <button class="btn"><i class="fas fa-plus"></i> Пополнить</button>
+                    <button class="btn"><i class="fas fa-history"></i> История</button>
+                </div>
+                
+                <div class="card-header" style="margin-top:30px;">
+                    <h2 class="card-title">Курс валют</h2>
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                
+                <div class="account-details">
+                    <div class="detail-row">
+                        <span class="detail-label">USD/KRW</span>
+                        <span class="detail-value">1,304.50</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">EUR/KRW</span>
+                        <span class="detail-value">1,420.75</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">RUB/KRW</span>
+                        <span class="detail-value">14.80</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">CNY/KRW</span>
+                        <span class="detail-value">180.20</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div class="footer">
-            © 2025 LingoUng Bank. Сеул, Южная Корея. Все права защищены.
-        </div>
+        <footer>
+            <p>© 2025 GlobalBank KRW. Все права защищены. Банковские услуги предоставляются ПАО "Сбербанк".</p>
+            <p>Лицензия ЦБ РФ № 1481. Корейские воны (KRW) используются для отображения информации.</p>
+        </footer>
     </div>
     
-    <div class="send-modal" id="sendModal">
-        <div class="modal-content">
-            <div class="close-modal" id="closeModal">
-                <i class="fas fa-times"></i>
-            </div>
-            <h2 class="modal-title">Отправить деньги</h2>
-            <form id="sendForm">
-                <div class="form-group">
-                    <label for="recipient">Получатель</label>
-                    <input type="text" id="recipient" class="form-control" placeholder="Введите имя или номер карты" required>
-                </div>
-                <div class="form-group">
-                    <label for="amount">Сумма (₽)</label>
-                    <input type="number" id="amount" class="form-control" placeholder="Введите сумму" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Сообщение (необязательно)</label>
-                    <textarea id="message" class="form-control" placeholder="Добавьте сообщение получателю" rows="2"></textarea>
-                </div>
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i> Отправить деньги
-                </button>
-            </form>
-        </div>
-    </div>
-    
-    <div class="notification" id="notification">
-        + ₽100.00 зачислено на ваш счёт!
-    </div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const balanceElement = document.getElementById('balance');
-            const earnButton = document.getElementById('earnBtn');
-            const sendButton = document.getElementById('sendBtn');
-            const sendModal = document.getElementById('sendModal');
-            const closeModal = document.getElementById('closeModal');
-            const sendForm = document.getElementById('sendForm');
-            const historyList = document.getElementById('historyList');
-            const notification = document.getElementById('notification');
-            
-            // Форматирование числа с разделителями
-            function formatNumber(num) {
-                return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
-            
-            // Парсинг числа из строки с форматированием
-            function parseFormattedNumber(str) {
-                return parseFloat(str.replace(/,/g, ''));
-            }
-            
-            // Показ уведомления
-            function showNotification(message) {
-                notification.textContent = message;
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Функция для заработка денег
-            function earnMoney(amount) {
-                // Получаем текущий баланс
-                const currentBalance = parseFormattedNumber(balanceElement.textContent);
-                const newBalance = currentBalance + amount;
+        // Обработка переключения пользователей
+        const currentUser = document.getElementById('current-user');
+        const userList = document.getElementById('user-list');
+        
+        currentUser.addEventListener('click', () => {
+            userList.classList.toggle('active');
+        });
+        
+        // Обработка выбора пользователя
+        const userItems = document.querySelectorAll('.user-list-item');
+        
+        userItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Удаляем активный класс у всех пользователей
+                userItems.forEach(user => user.classList.remove('active'));
                 
-                // Обновляем баланс
-                balanceElement.textContent = formatNumber(newBalance);
+                // Добавляем активный класс выбранному пользователю
+                item.classList.add('active');
                 
-                // Создаем новую транзакцию
-                const now = new Date();
-                const dateString = now.toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
+                // Обновляем отображаемого пользователя
+                const userName = item.querySelector('.user-name').textContent;
+                document.querySelector('.user-name').textContent = userName;
                 
-                const timeString = now.toLocaleTimeString('ru-RU', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+                // Закрываем список пользователей
+                userList.classList.remove('active');
                 
-                const newTransaction = document.createElement('li');
-                newTransaction.className = 'history-item';
-                newTransaction.innerHTML = `
-                    <div class="transaction-info">
-                        <div class="transaction-icon" style="background: rgba(185, 103, 255, 0.3);">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                        <div>
-                            <div class="transaction-type">Заработок в приложении</div>
-                            <div class="transaction-date">${dateString}, ${timeString}</div>
-                        </div>
-                    </div>
-                    <div class="transaction-amount income">+ ₽${formatNumber(amount)}</div>
-                `;
-                
-                // Добавляем новую транзакцию в начало списка
-                historyList.insertBefore(newTransaction, historyList.firstChild);
-                
-                // Показываем уведомление
-                showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счёт!`);
-            }
-            
-            // Функция для отправки денег
-            function sendMoney(recipient, amount) {
-                // Получаем текущий баланс
-                const currentBalance = parseFormattedNumber(balanceElement.textContent);
-                
-                // Проверяем, достаточно ли средств
-                if (amount > currentBalance) {
-                    showNotification('Недостаточно средств на счете!');
-                    return false;
-                }
-                
-                const newBalance = currentBalance - amount;
-                
-                // Обновляем баланс
-                balanceElement.textContent = formatNumber(newBalance);
-                
-                // Создаем новую транзакцию
-                const now = new Date();
-                const dateString = now.toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-                
-                const timeString = now.toLocaleTimeString('ru-RU', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                const newTransaction = document.createElement('li');
-                newTransaction.className = 'history-item';
-                newTransaction.innerHTML = `
-                    <div class="transaction-info">
-                        <div class="transaction-icon" style="background: rgba(255, 107, 156, 0.3);">
-                            <i class="fas fa-paper-plane"></i>
-                        </div>
-                        <div>
-                            <div class="transaction-type">Перевод: ${recipient}</div>
-                            <div class="transaction-date">${dateString}, ${timeString}</div>
-                        </div>
-                    </div>
-                    <div class="transaction-amount expense">- ₽${formatNumber(amount)}</div>
-                `;
-                
-                // Добавляем новую транзакцию в начало списка
-                historyList.insertBefore(newTransaction, historyList.firstChild);
-                
-                // Показываем уведомление
-                showNotification(`Перевод ₽${formatNumber(amount)} для ${recipient} выполнен!`);
-                
-                return true;
-            }
-            
-            // Обработчик нажатия на кнопку "Заработать"
-            earnButton.addEventListener('click', function() {
-                earnMoney(1000);
+                // Здесь можно добавить загрузку данных выбранного пользователя
             });
-            
-            // Обработчики для модального окна отправки
-            sendButton.addEventListener('click', function() {
-                sendModal.classList.add('active');
-            });
-            
-            closeModal.addEventListener('click', function() {
-                sendModal.classList.remove('active');
-            });
-            
-            sendForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const recipient = document.getElementById('recipient').value;
-                const amount = parseFloat(document.getElementById('amount').value);
-                
-                if (sendMoney(recipient, amount)) {
-                    // Закрываем модальное окно при успешной отправке
-                    sendModal.classList.remove('active');
-                    // Очищаем форму
-                    sendForm.reset();
-                }
-            });
-            
-            // Закрытие модального окна при клике вне его
-            window.addEventListener('click', function(e) {
-                if (e.target === sendModal) {
-                    sendModal.classList.remove('active');
-                }
-            });
+        });
+        
+        // Закрытие списка пользователей при клике вне его
+        document.addEventListener('click', (e) => {
+            if (!currentUser.contains(e.target) && !userList.contains(e.target)) {
+                userList.classList.remove('active');
+            }
         });
     </script>
 </body>
