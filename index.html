@@ -283,6 +283,36 @@
             background: rgba(185, 103, 255, 0.3);
             border-color: #b967ff;
         }
+        .invest-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .invest-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(185, 103, 255, 0.3);
+        }
+        .invest-name {
+            font-weight: bold;
+        }
+        .invest-rate {
+            color: #4CAF50;
+            font-size: 14px;
+        }
+        .custom-amount {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .custom-amount input {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -325,9 +355,9 @@
                 <i class="fas fa-exchange-alt"></i>
                 Обменник
             </button>
-            <button class="btn" id="historyBtn">
-                <i class="fas fa-history"></i>
-                История
+            <button class="btn" id="investBtn">
+                <i class="fas fa-chart-line"></i>
+                Инвестиции
             </button>
         </div>
     </div>
@@ -419,6 +449,49 @@
         </div>
     </div>
     
+    <!-- Модальное окно инвестиций -->
+    <div class="modal" id="investModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-chart-line"></i> Инвестиции</h3>
+                <button class="close-btn" id="closeInvestModal">&times;</button>
+            </div>
+            <form id="investForm">
+                <div class="invest-options">
+                    <div class="invest-option">
+                        <div>
+                            <div class="invest-name">Фондовый рынок</div>
+                            <div class="invest-rate">Доходность: ~15% годовых</div>
+                        </div>
+                        <button type="button" class="invest-btn" data-type="stocks" data-rate="15">Инвестировать</button>
+                    </div>
+                    <div class="invest-option">
+                        <div>
+                            <div class="invest-name">Облигации</div>
+                            <div class="invest-rate">Доходность: ~8% годовых</div>
+                        </div>
+                        <button type="button" class="invest-btn" data-type="bonds" data-rate="8">Инвестировать</button>
+                    </div>
+                    <div class="invest-option">
+                        <div>
+                            <div class="invest-name">Криптовалюты</div>
+                            <div class="invest-rate">Доходность: ~30% годовых (риск!)</div>
+                        </div>
+                        <button type="button" class="invest-btn" data-type="crypto" data-rate="30">Инвестировать</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="investAmount">Сумма инвестиции (₽)</label>
+                    <div class="custom-amount">
+                        <input type="number" id="investAmount" class="form-control" placeholder="Введите сумму" min="1" required>
+                        <button type="button" id="investMaxBtn" class="btn" style="padding: 10px;">Макс</button>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Подтвердить инвестицию</button>
+            </form>
+        </div>
+    </div>
+    
     <!-- Модальное окно истории -->
     <div class="modal" id="historyModal">
         <div class="modal-content">
@@ -441,26 +514,30 @@
             const earnBtn = document.getElementById('earnBtn');
             const sendBtn = document.getElementById('sendBtn');
             const exchangeBtn = document.getElementById('exchangeBtn');
-            const historyBtn = document.getElementById('historyBtn');
+            const investBtn = document.getElementById('investBtn');
             const generateCardBtn = document.getElementById('generateCardBtn');
             const cardsContainer = document.getElementById('cardsContainer');
+            const investMaxBtn = document.getElementById('investMaxBtn');
             
             // Модальные окна
             const cardModal = document.getElementById('cardModal');
             const sendModal = document.getElementById('sendModal');
             const exchangeModal = document.getElementById('exchangeModal');
+            const investModal = document.getElementById('investModal');
             const historyModal = document.getElementById('historyModal');
             
             // Кнопки закрытия
             const closeCardModal = document.getElementById('closeCardModal');
             const closeSendModal = document.getElementById('closeSendModal');
             const closeExchangeModal = document.getElementById('closeExchangeModal');
+            const closeInvestModal = document.getElementById('closeInvestModal');
             const closeHistoryModal = document.getElementById('closeHistoryModal');
             
             // Формы
             const cardForm = document.getElementById('cardForm');
             const sendForm = document.getElementById('sendForm');
             const exchangeForm = document.getElementById('exchangeForm');
+            const investForm = document.getElementById('investForm');
             
             // Элементы обменника
             const fromAmount = document.getElementById('fromAmount');
@@ -469,6 +546,10 @@
             const result = document.getElementById('result');
             const convertBtn = document.getElementById('convertBtn');
             
+            // Элементы инвестиций
+            const investAmount = document.getElementById('investAmount');
+            const investBtns = document.querySelectorAll('.invest-btn');
+            
             // Уведомления
             const notification = document.getElementById('notification');
             const historyList = document.getElementById('historyList');
@@ -476,6 +557,7 @@
             // Данные приложения
             let balance = 50000;
             let cards = [];
+            let investments = [];
             let history = [];
             const rates = {
                 RUB: { USD: 0.011, EUR: 0.010 },
@@ -535,12 +617,13 @@
                     const icon = transaction.type === 'earn' ? 'fa-coins' : 
                                 transaction.type === 'send' ? 'fa-paper-plane' : 
                                 transaction.type === 'exchange' ? 'fa-exchange-alt' : 
-                                transaction.type === 'card' ? 'fa-credit-card' : 'fa-question';
+                                transaction.type === 'card' ? 'fa-credit-card' :
+                                transaction.type === 'invest' ? 'fa-chart-line' : 'fa-question';
                     
-                    const amountClass = transaction.type === 'earn' ? 'color: #4CAF50;' : 
+                    const amountClass = transaction.type === 'earn' || transaction.type === 'invest' ? 'color: #4CAF50;' : 
                                       transaction.type === 'send' ? 'color: #F44336;' : '';
                     
-                    const amountSign = transaction.type === 'earn' ? '+' : '-';
+                    const amountSign = transaction.type === 'earn' || transaction.type === 'invest' ? '+' : '-';
                     
                     item.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -659,11 +742,19 @@
             
             // Обработчики событий
             earnBtn.addEventListener('click', function() {
-                const amount = 1000;
-                balance += amount;
+                const amount = prompt("Введите сумму для заработка:", "1000");
+                if (amount === null) return;
+                
+                const parsedAmount = parseFloat(amount);
+                if (isNaN(parsedAmount) || parsedAmount <= 0) {
+                    showNotification('Введите корректную сумму');
+                    return;
+                }
+                
+                balance += parsedAmount;
                 updateBalance();
-                addHistory('earn', amount, 'Заработок в приложении');
-                showNotification(`+ ₽${formatNumber(amount)} зачислено на ваш счет`);
+                addHistory('earn', parsedAmount, 'Заработок в приложении');
+                showNotification(`+ ₽${formatNumber(parsedAmount)} зачислено на ваш счет`);
             });
             
             generateCardBtn.addEventListener('click', function() {
@@ -783,6 +874,87 @@
                 exchangeModal.classList.remove('active');
             });
             
+            investBtn.addEventListener('click', function() {
+                investModal.classList.add('active');
+            });
+            
+            closeInvestModal.addEventListener('click', function() {
+                investModal.classList.remove('active');
+            });
+            
+            // Кнопка "Макс" для инвестиций
+            investMaxBtn.addEventListener('click', function() {
+                investAmount.value = balance;
+            });
+            
+            // Выбор типа инвестиций
+            let selectedInvestType = null;
+            let selectedInvestRate = null;
+            
+            investBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    investBtns.forEach(b => b.style.backgroundColor = '');
+                    this.style.backgroundColor = 'rgba(185, 103, 255, 0.3)';
+                    selectedInvestType = this.dataset.type;
+                    selectedInvestRate = parseFloat(this.dataset.rate);
+                });
+            });
+            
+            investForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!selectedInvestType) {
+                    showNotification('Выберите тип инвестиции');
+                    return;
+                }
+                
+                const amount = parseFloat(investAmount.value);
+                if (isNaN(amount)) {
+                    showNotification('Введите корректную сумму');
+                    return;
+                }
+                
+                if (amount <= 0) {
+                    showNotification('Сумма должна быть больше нуля');
+                    return;
+                }
+                
+                if (amount > balance) {
+                    showNotification('Недостаточно средств на счете');
+                    return;
+                }
+                
+                balance -= amount;
+                updateBalance();
+                
+                // Рассчитываем примерный доход через год
+                const yearlyProfit = amount * (selectedInvestRate / 100);
+                
+                addHistory('invest', amount, `Инвестиция в ${getInvestName(selectedInvestType)}`, {
+                    type: selectedInvestType,
+                    amount: amount,
+                    rate: selectedInvestRate,
+                    expectedProfit: yearlyProfit
+                });
+                
+                showNotification(`Инвестиция ₽${formatNumber(amount)} оформлена. Ожидаемая доходность: ~${selectedInvestRate}% годовых`);
+                
+                investForm.reset();
+                investBtns.forEach(b => b.style.backgroundColor = '');
+                selectedInvestType = null;
+                selectedInvestRate = null;
+                investModal.classList.remove('active');
+            });
+            
+            function getInvestName(type) {
+                switch(type) {
+                    case 'stocks': return 'фондовый рынок';
+                    case 'bonds': return 'облигации';
+                    case 'crypto': return 'криптовалюты';
+                    default: return type;
+                }
+            }
+            
             historyBtn.addEventListener('click', function() {
                 historyModal.classList.add('active');
             });
@@ -802,6 +974,9 @@
                 if (e.target === exchangeModal) {
                     exchangeModal.classList.remove('active');
                 }
+                if (e.target === investModal) {
+                    investModal.classList.remove('active');
+                }
                 if (e.target === historyModal) {
                     historyModal.classList.remove('active');
                 }
@@ -812,4 +987,4 @@
         });
     </script>
 </body>
-                    </html>
+    </html>
