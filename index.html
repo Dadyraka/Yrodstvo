@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+    
+    <!-- Force cache refresh -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- Preload Google Fonts with display=swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    
+    <!-- Preload critical resources -->
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4B5EAA">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="temfy.app">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- App Description -->
+    <meta name="description" content="Generate professional emails in seconds with AI-powered tone selection and multilingual support">
+    <meta name="keywords" content="email generator, AI, professional emails, multilingual, productivity">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    
+    <!-- Manifest and Icons -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="images/icon.svg">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="temfy.app - AI Email Generator">
+    <meta property="og:description" content="Write Better Emails in 3 Seconds with AI-powered tone selection and multilingual support">
+    <meta property="og:url" content="https://temfy.app">
+    <meta property="og:image" content="images/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:site_name" content="temfy.app">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="temfy.app - AI Email Generator">
+    <meta name="twitter:description" content="Write Better Emails in 3 Seconds with AI-powered tone selection and multilingual support">
+    <meta name="twitter:image" content="https://temfy.app/social-preview.png">
+    <meta name="twitter:site" content="@temfyapp">
+    <meta name="twitter:creator" content="@temfyapp">
+    
+    <!-- Additional Social Media Meta Tags -->
+    <meta name="linkedin:card" content="summary_large_image">
+    <meta name="linkedin:title" content="temfy.app - AI Email Generator">
+    <meta name="linkedin:description" content="Write Better Emails in 3 Seconds with AI-powered tone selection and multilingual support">
+    <meta name="linkedin:image" content="https://temfy.app/social-preview.png">
+    
+    <!-- WhatsApp Meta Tags -->
+    <meta property="og:image:alt" content="temfy.app - AI Email Generator">
+    
+    <title>temfy.app - AI Email Generator</title>
+    
+    <!-- Google Tag Manager -->
+    <script>
+      (function(w,d,s,l,i){
+        w[l]=w[l]||[];
+        w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+        
+        // Add error handling for GTM
+        j.onerror = function() {
+          console.warn('Google Tag Manager failed to load');
+        };
+        
+        f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-WWMM4VS2');
+    </script>
+    <!-- End Google Tag Manager -->
+    <script type="module" crossorigin="" src="js/index-BoIg50lv.js"></script>
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-Cqto6GnX.js">
+    <link rel="stylesheet" crossorigin="" href="css/index-DmmyzX3h.css">
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WWMM4VS2"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
+    <div id="root"></div>
+    
+
+    <script>
+      // Force cache refresh on page load
+      if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+        window.location.reload();
+      }
+      
+      // Handle module loading errors
+      window.addEventListener('error', function(e) {
+        if (e.message.includes('Failed to load module script') || 
+            e.message.includes('MIME type') ||
+            e.message.includes('application/javascript')) {
+          console.error('Module loading error detected:', e);
+          
+          // Check if it's an asset loading error
+          const target = e.target;
+          if (target && target.src && target.src.includes('/assets/')) {
+            console.warn('Asset loading failed, attempting to reload in 2 seconds...');
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            // For other module errors, reload immediately
+            console.error('Module loading error detected, attempting to reload...');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+        }
+      });
+
+      // Handle external resource loading errors
+      window.addEventListener('error', function(e) {
+        const target = e.target;
+        if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+          const src = target.src || target.href;
+          if (src && (src.includes('googletagmanager.com') || 
+                      src.includes('google-analytics.com') ||
+                      src.includes('doubleclick.net'))) {
+            console.warn('External analytics resource failed to load:', src);
+            // Don't reload the page for analytics failures
+            e.preventDefault();
+          }
+        }
+      }, true);
+
+      // Add unhandled promise rejection handler
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+        // Don't reload for promise rejections, just log them
+      });
+    </script>
+    
+    <!-- Development cache clearing script -->
+    <script>
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Clear PWA cache on development
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
+        // Clear browser cache for manifest and icons
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) {
+              caches.delete(name);
+            }
+          });
+        }
+      }
+    </script>
+    
+
+  
+</body></html>
