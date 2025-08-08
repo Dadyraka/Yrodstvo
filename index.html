@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Liongung Bank — RP версия</title>
+  <style>
+    :root{
+      /* Фиолетово-черная палитра */
+      --bg:#0a0712; --card:#140a1f; --muted:#b8a9d9; --text:#efe9ff;
+      --accent:#8a5cff; --accent2:#d24fff; --danger:#ff5468; --warn:#ffc857;
+      --ok:#18b26b; --border:#2a1b3b; --shadow:0 8px 24px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:
+        radial-gradient(1200px 600px at 15% -10%, #2a0f4a 0%, transparent 60%),
+        radial-gradient(800px 500px at 85% 110%, #3e146b 0%, transparent 60%),
+        linear-gradient(180deg, #050309, #000000 50%, #07040d);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; backdrop-filter: blur(10px);
+      background: rgba(10,7,18,.7); border-bottom:1px solid var(--border); z-index:10;
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:16px}
+    .brand{display:flex; align-items:center; gap:12px; padding:8px 0}
+    .logo{
+      width:36px; height:36px; border-radius:10px; background:
+        conic-gradient(from 210deg, var(--accent) 0 45%, var(--accent2) 45% 80%, #6f3cff 80% 100%);
+      box-shadow: 0 0 30px rgba(210,79,255,.2) inset, 0 10px 24px rgba(138,92,255,.25);
+    }
+    h1{font-size:22px; margin:0}
+    .notice{
+      background: #0f0a1b; border:1px dashed var(--border); padding:10px 12px; border-radius:10px; color:#e6dcff; font-size:14px;
+    }
+    nav{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 6px}
+    nav button{
+      background:linear-gradient(135deg, #1b1030, #0b0714); color:var(--text); border:1px solid var(--border);
+      padding:12px 14px; border-radius:12px; cursor:pointer; transition:.2s; font-weight:700;
+    }
+    nav button.active, nav button:hover{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(138,92,255,.18) }
+    main{padding:10px 0 64px}
+    .grid{display:grid; gap:16px}
+    @media(min-width:900px){ .grid-3{grid-template-columns: 1.2fr 1fr 1fr} .grid-2{grid-template-columns: 1fr 1fr} }
+    .card{
+      background: linear-gradient(180deg, #1b1130, #0d0817); border:1px solid var(--border);
+      border-radius:16px; padding:16px; box-shadow: var(--shadow);
+    }
+    .card h2{margin:0 0 8px; font-size:18px}
+    .muted{color:var(--muted); font-size:13px}
+    .balances{display:grid; gap:8px}
+    .balance{
+      display:flex; justify-content:space-between; align-items:center;
+      background:linear-gradient(180deg, #140a1f, #0e0a16); border:1px solid var(--border);
+      padding:12px; border-radius:12px;
+    }
+    .balance strong{font-size:20px}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    input, select{
+      width:100%; padding:12px 12px; border-radius:12px; border:1px solid var(--border);
+      background:#0e0a16; color:var(--text); font-size:16px;
+    }
+    label{font-size:13px; color:#e6dcff}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+      background:linear-gradient(135deg, #1b1030, #0b0714); color:var(--text); cursor:pointer; font-weight:800;
+    }
+    .btn-accent{ background: linear-gradient(135deg, #8a5cff, #d24fff); border:none; color:#0e061b }
+    .btn-ok{ background:var(--ok); border:none; color:#03130b }
+    .btn-danger{ background:var(--danger); border:none }
+    .btn-ghost{ background:transparent; }
+    .right{margin-left:auto}
+    .cards-wrap{display:grid; gap:12px}
+    .vcard{
+      background: linear-gradient(135deg, #26123f, #0f081d);
+      border:1px solid var(--border); border-radius:16px; padding:14px; position:relative; overflow:hidden;
+    }
+    .vcard .net{font-weight:800; letter-spacing:.5px}
+    .vcard .num{font-size:18px; letter-spacing:2px; margin-top:8px}
+    .vcard .meta{font-size:12px; color:#e6dcff}
+    .tx-list{display:grid; gap:10px; max-height:320px; overflow:auto; padding-right:4px}
+    .tx{display:flex; justify-content:space-between; padding:10px; border:1px solid var(--border); border-radius:10px;
+      background:linear-gradient(180deg, #140a1f, #0e0a16)}
+    .pill{font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border); color:#e6dcff}
+    .success{color:#0bd48c}
+    .warn{color:var(--warn)}
+    .danger{color:#ff808f}
+    .footer{margin-top:16px; font-size:12px; color:#b8a9d9}
+    .sep{height:1px; background:linear-gradient(90deg, transparent, #3a235a, transparent); margin:14px 0}
+    .info{font-size:13px; color:#d2c3f5}
+    .link{color:#cbb7ff; text-decoration:underline dotted}
+
+    /* Мобильные улучшения */
+    @media(max-width:600px){
+      h1{font-size:20px}
+      nav{position:sticky; top:52px; background:rgba(10,7,18,.85); padding:8px; border-radius:12px}
+      nav button{flex:1; min-width:120px}
+      .tx-list{max-height:50vh}
+      .brand{gap:10px}
+      .logo{width:32px;height:32px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>Liongung Bank</h1>
+        <button class="btn btn-ghost right" id="resetBtn">Сбросить</button>
+      </div>
+      <div class="notice">
+        Учебная симуляция для RP. Реальных денег, карт и переводов нет — все операции существуют только в вашем браузере.
+      </div>
+      <nav id="tabs">
+        <button data-tab="dash" class="active">Обзор</button>
+        <button data-tab="send">Отправить</button>
+        <button data-tab="convert">Конвертер</button>
+        <button data-tab="cards">Карты</button>
+        <button data-tab="invest">Инвестиции</button>
+        <button data-tab="history">История</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- DASH -->
+    <section id="tab-dash">
+      <div class="grid grid-3">
+        <div class="card">
+          <h2>Счета (3 валюты)</h2>
+          <p class="muted">Балансы для RP. «Заработать» пополняет USD на случайную сумму $100–$200.</p>
+          <div class="balances" id="balances"></div>
+          <div class="sep"></div>
+          <button class="btn btn-accent" id="earnBtn">Заработать $100–$200</button>
+        </div>
+
+        <div class="card">
+          <h2>Быстрая отправка</h2>
+          <div class="row">
+            <div style="flex:1">
+              <label>Получатель</label>
+              <input type="text" id="qRecipient" placeholder="например, Ivan Petrov">
+            </div>
+            <div style="width:120px">
+              <label>Сумма</label>
+              <input type="number" id="qAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div style="width:110px">
+              <label>Валюта</label>
+              <select id="qCurr"></select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn btn-ok" id="qSendBtn">Отправить</button>
+            <span id="qSendMsg" class="info"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Быстрый обмен</h2>
+          <div class="row">
+            <div style="width:120px">
+              <label>Из</label>
+              <select id="xFrom"></select>
+            </div>
+            <div style="width:120px">
+              <label>В</label>
+              <select id="xTo"></select>
+            </div>
+            <div style="flex:1">
+              <label>Сумма</label>
+              <input type="number" id="xAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn" id="xCalcBtn">Рассчитать</button>
+            <button class="btn btn-ok" id="xDoBtn">Поменять</button>
+            <span id="xResult" class="info"></span>
+          </div>
+          <p class="muted" id="rateInfo"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEND -->
+    <section id="tab-send" hidden>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Отправить перевод</h2>
+          <div class="row">
+            <div style="flex:1">
+              <label>Получатель</label>
+              <input type="text" id="sRecipient" placeholder="Имя, ник или заметка">
+            </div>
+            <div style="width:140px">
+              <label>Сумма</label>
+              <input type="number" id="sAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div style="width:120px">
+              <label>Валюта</label>
+              <select id="sCurr"></select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div style="flex:1">
+              <label>Комментарий</label>
+              <input type="text" id="sNote" placeholder="за что перевод">
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn btn-ok" id="sSendBtn">Отправить</button>
+            <span id="sMsg" class="info"></span>
+          </div>
+          <p class="muted">Реальной отправки нет — это RP интерфейс, запись в историю и корректировка баланса.</p>
+        </div>
+        <div class="card">
+          <h2>Последние операции</h2>
+          <div id="lastTx" class="tx-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONVERT -->
+    <section id="tab-convert" hidden>
+      <div class="card">
+        <h2>Конвертер валют</h2>
+        <p class="muted">Фиксированные учебные курсы. «Поменять» спишет один счёт и зачислит на другой.</p>
+        <div class="row">
+          <div style="width:140px">
+            <label>Из</label>
+            <select id="cFrom"></select>
+          </div>
+          <div style="width:140px">
+            <label>В</label>
+            <select id="cTo"></select>
+          </div>
+          <div style="width:180px">
+            <label>Сумма</label>
+            <input type="number" id="cAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div style="flex:1">
+            <label>Результат</label>
+            <input type="text" id="cOut" readonly placeholder="0.00">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="cCalc">Рассчитать</button>
+          <button class="btn btn-ok" id="cSwap">Поменять</button>
+          <span id="cMsg" class="info"></span>
+        </div>
+        <div class="sep"></div>
+        <div class="info" id="cRatesInfo"></div>
+      </div>
+    </section>
+
+    <!-- CARDS -->
+    <section id="tab-cards" hidden>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Выпуск «виртуальной» карты</h2>
+          <p class="muted">Выберите платежную систему. Номера вымышленные и не предназначены для использования.</p>
+          <div class="row">
+            <div style="flex:1">
+              <label>Платежная система</label>
+              <select id="cardNet"></select>
+            </div>
+            <div style="width:180px">
+              <label>Имя на карте</label>
+              <input type="text" id="cardName" placeholder="IVAN IVANOV">
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn btn-accent" id="issueCard">Выпустить карту</button>
+            <span class="info">Будет создана виртуальная карта с случайным номером.</span>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Мои карты</h2>
+          <div id="cardsList" class="cards-wrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVEST -->
+    <section id="tab-invest" hidden>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Инвестиции</h2>
+          <p class="muted">Гибкий вклад в USD. Доход по ставке 5% годовых, расчёт при действиях.</p>
+          <div class="row">
+            <div style="width:220px">
+              <label>Сумма для вложения (USD)</label>
+              <input type="number" id="ivAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn btn-ok" id="ivDeposit">Вложить</button>
+            <button class="btn" id="ivHarvest">Снять доход</button>
+            <button class="btn btn-danger" id="ivWithdraw">Вывести вклад</button>
+            <button class="btn" id="ivRefresh">Обновить доход</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Состояние</h2>
+          <div id="ivState" class="info"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="tab-history" hidden>
+      <div class="card">
+        <h2>История операций</h2>
+        <div id="txAll" class="tx-list"></div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Liongung Bank — учебная RP‑симуляция. Данные только в вашем браузере (localStorage).
+    </div>
+  </main>
+
+  <script>
+    const CURRENCIES = ["USD","EUR","GBP"];
+    const DEFAULT_STATE = {
+      balances: { USD: 500, EUR: 300, GBP: 200 },
+      // Учебные фиксированные курсы: база — USD
+      rates: { USD:1, EUR:0.92, GBP:0.78 },
+      spread: 0.002, // небольшой спрэд на обмен
+      tx: [],
+      cards: [],
+      invest: { apr: 0.05, principalUSD: 0, accruedUSD: 0, lastTs: Date.now() }
+    };
+
+    const CARD_NETWORKS = [
+      "Visa","Mastercard","American Express","Discover","UnionPay","JCB","MIR","Maestro",
+      "Diners Club","RuPay","Interac","Elo","Hipercard","Troy","UATP"
+    ];
+
+    let state = loadState();
+
+    // ---------- Storage ----------
+    function loadState(){
+      try{
+        const raw = localStorage.getItem("liongungBankState");
+        if(!raw) return structuredClone(DEFAULT_STATE);
+        const st = JSON.parse(raw);
+        for(const c of CURRENCIES){ if(!(c in (st.balances||{}))) st.balances[c]=0; }
+        if(!st.rates) st.rates = structuredClone(DEFAULT_STATE.rates);
+        if(typeof st.spread!=="number") st.spread = DEFAULT_STATE.spread;
+        if(!st.tx) st.tx=[];
+        if(!st.cards) st.cards=[];
+        if(!st.invest) st.invest = structuredClone(DEFAULT_STATE.invest);
+        return st;
+      }catch(e){ return structuredClone(DEFAULT_STATE); }
+    }
+    function saveState(){ localStorage.setItem("liongungBankState", JSON.stringify(state)); }
+
+    // ---------- Utils ----------
+    const fmt = (n) => Number(n).toLocaleString("ru-RU", {minimumFractionDigits:2, maximumFractionDigits:2});
+    function addTx(type, desc, amount, currency){
+      state.tx.unshift({id: crypto.randomUUID(), ts: Date.now(), type, desc, amount, currency});
+      if(state.tx.length>200) state.tx.length=200;
+      saveState(); renderHistory();
+    }
+
+    // Генерация вымышленного номера карты (16 цифр), заведомо невалидная по Luhn
+    function generateFakeCardNumber(){
+      // Стартуем с 9, чтобы не имитировать реальные IIN
+      let digits = [9];
+      for(let i=1;i<16;i++){ digits.push(Math.floor(Math.random()*10)); }
+      // Проверим Luhn и испортим, если «случайно» валидна
+      const luhn = (arr)=>{
+        let sum=0; for(let i=0;i<16;i++){
+          let d = arr[15-i];
+          if(i%2===1){ d*=2; if(d>9) d-=9; }
+          sum+=d;
+        } return sum%10===0;
+      };
+      if(luhn(digits)){
+        digits[15] = (digits[15]+1)%10; // сломать контроль
+      }
+      // Формат в группы по 4
+      return digits.join("").replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+    }
+
+    const nowStr = () => new Date().toLocaleString('ru-RU');
+    function ensureRatesInfo(){
+      const pairs = [
+        `1 USD = ${fmt(state.rates.EUR)} EUR`,
+        `1 USD = ${fmt(state.rates.GBP)} GBP`,
+        `1 EUR ≈ ${fmt(1/state.rates.EUR)} USD`,
+        `1 GBP ≈ ${fmt(1/state.rates.GBP)} USD`
+      ];
+      document.getElementById("rateInfo").textContent = pairs.join(" • ");
+      document.getElementById("cRatesInfo").textContent = "Учебные курсы: " + pairs.join(" • ");
+    }
+
+    // ---------- Invest accrual ----------
+    function accrueInvest(){
+      const inv = state.invest;
+      const nowTs = Date.now();
+      const dt = Math.max(0, nowTs - (inv.lastTs||nowTs));
+      if(dt>0 && inv.principalUSD>0){
+        const days = dt / 86400000;
+        const add = inv.principalUSD * inv.apr * (days/365);
+        inv.accruedUSD += add;
+      }
+      inv.lastTs = nowTs;
+      saveState();
+    }
+
+    // ---------- Rendering ----------
+    function renderBalances(){
+      const root = document.getElementById("balances");
+      root.innerHTML = "";
+      CURRENCIES.forEach(c=>{
+        const li = document.createElement("div");
+        li.className="balance";
+        li.innerHTML = `
+          <div><div class="pill">${c}</div><div class="muted">Доступно</div></div>
+          <strong>${fmt(state.balances[c])} ${c}</strong>`;
+        root.appendChild(li);
+      });
+      // selects
+      ["qCurr","sCurr","xFrom","xTo","cFrom","cTo"].forEach(id=>{
+        const sel = document.getElementById(id);
+        if(!sel) return;
+        const keep = sel.value;
+        sel.innerHTML = CURRENCIES.map(c=>`<option value="${c}">${c}</option>`).join("");
+        if(keep && CURRENCIES.includes(keep)) sel.value = keep;
+        if(id==="xTo" || id==="cTo") sel.selectedIndex = 1;
+      });
+    }
+
+    function renderQuickTx(){
+      const last = state.tx.slice(0,6);
+      const root = document.getElementById("lastTx");
+      root.innerHTML = last.map(tx=>`
+        <div class="tx">
+          <div>
+            <div><strong>${tx.type}</strong> — ${tx.desc}</div>
+            <div class="muted">${new Date(tx.ts).toLocaleString('ru-RU')}</div>
+          </div>
+          <div class="${tx.amount>=0?'success':'danger'}">${tx.amount>=0?'+':''}${fmt(tx.amount)} ${tx.currency}</div>
+        </div>
+      `).join("") || `<div class="muted">Пока нет операций</div>`;
+    }
+
+    function renderCards(){
+      const root = document.getElementById("cardsList");
+      if(state.cards.length===0){
+        root.innerHTML = `<div class="muted">Карт пока нет. Выпустите виртуальную карту выше.</div>`;
+        return;
+      }
+      root.innerHTML = state.cards.map(c=>`
+        <div class="vcard">
+          <div class="row">
+            <div class="net">${c.network}</div>
+            <button class="btn btn-ghost right" onclick="removeCard('${c.id}')">Удалить</button>
+          </div>
+          <div class="num">${c.number}</div>
+          <div class="meta">Имя: ${c.name||'CARDHOLDER'} • Срок: ${c.exp} • CVV: ${c.cvv}</div>
+          <div class="muted">Фиктивная карта для RP. Номера не предназначены для использования.</div>
+        </div>
+      `).join("");
+    }
+
+    function renderInvest(){
+      accrueInvest();
+      const inv = state.invest;
+      const el = document.getElementById("ivState");
+      el.innerHTML = `
+        <div>Вклад (principal): <strong>${fmt(inv.principalUSD)} USD</strong></div>
+        <div>Накопленный доход: <strong>${fmt(inv.accruedUSD)} USD</strong></div>
+        <div>Ставка: <strong>${(inv.apr*100).toFixed(2)}%</strong> годовых</div>
+        <div class="muted">Обновлено: ${new Date(inv.lastTs).toLocaleString('ru-RU')}</div>
+      `;
+    }
+
+    function renderHistory(){
+      const root = document.getElementById("txAll");
+      root.innerHTML = state.tx.map(tx=>`
+        <div class="tx">
+          <div>
+            <div><strong>${tx.type}</strong> — ${tx.desc}</div>
+            <div class="muted">${new Date(tx.ts).toLocaleString('ru-RU')}</div>
+          </div>
+          <div class="${tx.amount>=0?'success':'danger'}">${tx.amount>=0?'+':''}${fmt(tx.amount)} ${tx.currency}</div>
+        </div>
+      `).join("") || `<div class="muted">История пуста</div>`;
+      renderQuickTx();
+    }
+
+    // ---------- Actions ----------
+    function earn(){
+      const add = Math.floor(100 + Math.random()*101); // 100..200
+      state.balances.USD += add;
+      saveState(); renderBalances();
+      addTx("Заработок","Бонус RP", add, "USD");
+    document.getElementById("qSendMsg").textContent = "";
+    }
+
+    function send(recipient, amount, curr, note){
+      if(!recipient) return {ok:false, msg:"Укажите получателя"};
+      amount = Number(amount);
+      if(!(amount>0)) return {ok:false, msg:"Сумма должна быть больше 0"};
+      if(state.balances[curr] < amount) return {ok:false, msg:"Недостаточно средств"};
+      state.balances[curr] -= amount;
+      saveState(); renderBalances();
+      addTx("Перевод", `${recipient}${note? " • " + note:""}`, -amount, curr);
+      return {ok:true, msg:`Отправлено ${fmt(amount)} ${curr}`};
+    }
+
+    function calcRate(from, to){
+      if(from===to) return 1;
+      const toUSD = (val, cur) => (cur==="USD"? val : val / state.rates[cur]);
+      const fromUSD = (val, cur) => (cur==="USD"? val : val * state.rates[cur]);
+      return fromUSD( toUSD(1, from), to );
+    }
+
+    function convert(from, to, amount, doExchange=false){
+      amount = Number(amount);
+      if(!(amount>0)) return {ok:false, msg:"Введите сумму"};
+      if(from===to) return {ok:false, msg:"Выберите разные валюты"};
+      const r = calcRate(from, to);
+      const eff = doExchange ? (r * (1 - state.spread)) : r;
+      const out = amount * eff;
+      if(doExchange){
+        if(state.balances[from] < amount) return {ok:false, msg:"Недостаточно средств"};
+        state.balances[from] -= amount;
+        state.balances[to] += out;
+        saveState(); renderBalances();
+        addTx("Обмен", `${fmt(amount)} ${from} → ${fmt(out)} ${to}`, 0, to);
+      }
+      return {ok:true, msg:`${fmt(amount)} ${from} ≈ ${fmt(out)} ${to}`, out};
+    }
+
+    function issueCard(network, name){
+      if(!network) return {ok:false, msg:"Выберите систему"};
+      const id = crypto.randomUUID();
+      const number = generateFakeCardNumber();
+      const exp = `${String(Math.floor(1+Math.random()*12)).padStart(2,'0')}/` + (String((new Date().getFullYear()+4)%100).padStart(2,'0'));
+      const cvv = "***";
+      state.cards.unshift({id, network, name: (name||"CARDHOLDER").toUpperCase(), number, exp, cvv});
+      saveState(); renderCards();
+      addTx("Карта", `Выпуск карты ${network}`, 0, "USD");
+      return {ok:true, msg:`Карта ${network} выпущена`};
+    }
+    function removeCard(id){
+      state.cards = state.cards.filter(c=>c.id!==id);
+      saveState(); renderCards();
+    }
+
+    // ---------- Bind UI ----------
+    function bind(){
+      // Tabs
+      document.querySelectorAll("#tabs button").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("active"));
+          b.classList.add("active");
+          const tab = b.dataset.tab;
+          document.querySelectorAll("main section").forEach(s=>s.hidden=true);
+          document.getElementById("tab-"+tab).hidden=false;
+        });
+      });
+
+      document.getElementById("resetBtn").addEventListener("click", ()=>{
+        if(confirm("Сбросить данные и начать заново?")){
+          localStorage.removeItem("liongungBankState");
+          state = loadState();
+          renderAll();
+        }
+      });
+
+      // Earn
+      document.getElementById("earnBtn").addEventListener("click", earn);
+
+      // Quick send
+      document.getElementById("qSendBtn").addEventListener("click", ()=>{
+        const msg = document.getElementById("qSendMsg");
+        const r = send(
+          document.getElementById("qRecipient").value.trim(),
+          document.getElementById("qAmount").value,
+          document.getElementById("qCurr").value,
+          ""
+        );
+        msg.textContent = r.msg;
+        msg.style.color = r.ok ? "#0bd48c" : "#ff808f";
+        if(r.ok){
+          document.getElementById("qAmount").value="";
+          document.getElementById("qRecipient").value="";
+        }
+      });
+
+      // Exchange (dash)
+      document.getElementById("xCalcBtn").addEventListener("click", ()=>{
+        const r = convert(
+          document.getElementById("xFrom").value,
+          document.getElementById("xTo").value,
+          document.getElementById("xAmount").value,
+          false
+        );
+        const x = document.getElementById("xResult");
+        x.textContent = r.msg;
+        x.style.color = r.ok ? "#d2c3f5" : "#ff808f";
+      });
+      document.getElementById("xDoBtn").addEventListener("click", ()=>{
+        const r = convert(
+          document.getElementById("xFrom").value,
+          document.getElementById("xTo").value,
+          document.getElementById("xAmount").value,
+          true
+        );
+        const x = document.getElementById("xResult");
+        x.textContent = r.msg;
+        x.style.color = r.ok ? "#0bd48c" : "#ff808f";
+        if(r.ok) document.getElementById("xAmount").value="";
+      });
+
+      // Send (page)
+      document.getElementById("sSendBtn").addEventListener("click", ()=>{
+        const r = send(
+          document.getElementById("sRecipient").value.trim(),
+          document.getElementById("sAmount").value,
+          document.getElementById("sCurr").value,
+          document.getElementById("sNote").value.trim()
+        );
+        const sMsg = document.getElementById("sMsg");
+        sMsg.textContent = r.msg;
+        sMsg.style.color = r.ok ? "#0bd48c" : "#ff808f";
+        if(r.ok){
+          document.getElementById("sAmount").value="";
+          document.getElementById("sRecipient").value="";
+          document.getElementById("sNote").value="";
+        }
+      });
+
+      // Converter (page)
+      document.getElementById("cCalc").addEventListener("click", ()=>{
+        const r = convert(
+          document.getElementById("cFrom").value,
+          document.getElementById("cTo").value,
+          document.getElementById("cAmount").value,
+          false
+        );
+        document.getElementById("cOut").value = r.ok? r.msg.replace(/^.*≈ /,'') : "";
+        const m = document.getElementById("cMsg"); m.textContent = r.msg; m.style.color = r.ok ? "#d2c3f5" : "#ff808f";
+      });
+      document.getElementById("cSwap").addEventListener("click", ()=>{
+        const r = convert(
+          document.getElementById("cFrom").value,
+          document.getElementById("cTo").value,
+          document.getElementById("cAmount").value,
+          true
+        );
+        document.getElementById("cOut").value = r.ok? r.msg.replace(/^.*≈ /,'') : "";
+        const m = document.getElementById("cMsg"); m.textContent = r.msg; m.style.color = r.ok ? "#0bd48c" : "#ff808f";
+        if(r.ok) document.getElementById("cAmount").value="";
+      });
+
+      // Cards
+      const netSel = document.getElementById("cardNet");
+      netSel.innerHTML = CARD_NETWORKS.map(n=>`<option value="${n}">${n}</option>`).join("");
+      document.getElementById("issueCard").addEventListener("click", ()=>{
+        const r = issueCard(
+          document.getElementById("cardNet").value,
+          document.getElementById("cardName").value
+        );
+        alert(r.msg);
+      });
+
+      // Invest
+      document.getElementById("ivDeposit").addEventListener("click", ()=>{
+        accrueInvest();
+        const amt = Number(document.getElementById("ivAmount").value);
+        if(!(amt>0)) return alert("Введите сумму");
+        if(state.balances.USD < amt) return alert("Недостаточно USD");
+        state.balances.USD -= amt;
+        state.invest.principalUSD += amt;
+        saveState(); renderBalances(); renderInvest();
+        addTx("Инвестиции","Вложение во вклад", -amt, "USD");
+        document.getElementById("ivAmount").value="";
+      });
+      document.getElementById("ivHarvest").addEventListener("click", ()=>{
+        accrueInvest();
+        const gain = state.invest.accruedUSD;
+        if(gain<=0.001) return alert("Дохода нет");
+        state.invest.accruedUSD = 0;
+        state.balances.USD += gain;
+        saveState(); renderBalances(); renderInvest();
+        addTx("Инвестиции","Снятие дохода", gain, "USD");
+      });
+      document.getElementById("ivWithdraw").addEventListener("click", ()=>{
+        accrueInvest();
+        const p = state.invest.principalUSD;
+        if(p<=0.001) return alert("Вклада нет");
+        state.invest.principalUSD = 0;
+        state.balances.USD += p;
+        saveState(); renderBalances(); renderInvest();
+        addTx("Инвестиции","Вывод вклада", p, "USD");
+      });
+      document.getElementById("ivRefresh").addEventListener("click", renderInvest);
+    }
+
+    function renderAll(){
+      renderBalances(); ensureRatesInfo(); renderQuickTx(); renderCards(); renderInvest(); renderHistory();
+      // Prefill selects
+      document.getElementById("qCurr").value="USD";
+      document.getElementById("xFrom").value="USD";
+      document.getElementById("xTo").value="EUR";
+      document.getElementById("cFrom").value="USD";
+      document.getElementById("cTo").value="EUR";
+    }
+
+    // Init
+    bind(); renderAll();
+  </script>
+</body>
+</html>
