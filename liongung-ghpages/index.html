@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Liongung Bank — демо</title>
+    <meta name="description" content="Ненастоящий банк Liongung — демо-сайт для GitHub Pages" />
+    <link rel="icon" href="assets/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <img src="assets/logo.svg" alt="Liongung" class="brand__logo" />
+        <div class="brand__text">
+          <h1 class="brand__title">Liongung Bank</h1>
+          <p class="brand__subtitle">Демо-версия (ненастоящий банк)</p>
+        </div>
+      </div>
+      <button id="resetDataBtn" class="btn btn--text" title="Сбросить локальные данные">Сброс</button>
+    </header>
+
+    <main class="container">
+      <section class="balance-card">
+        <div class="balance-card__label">Текущий баланс</div>
+        <div id="balanceValue" class="balance-card__value">$0.00</div>
+      </section>
+
+      <section class="actions-grid">
+        <button id="earnBtn" class="action action--earn">
+          <span class="action__emoji">💰</span>
+          <span class="action__title">Заработать</span>
+          <span class="action__desc">+50 или +150 USD</span>
+        </button>
+        <button id="sendBtn" class="action action--send">
+          <span class="action__emoji">📤</span>
+          <span class="action__title">Отправить</span>
+          <span class="action__desc">Перевод на реквизиты</span>
+        </button>
+        <button id="receiveBtn" class="action action--receive">
+          <span class="action__emoji">📥</span>
+          <span class="action__title">Получить</span>
+          <span class="action__desc">Реквизиты и ссылки</span>
+        </button>
+        <button id="cardsBtn" class="action action--cards">
+          <span class="action__emoji">💳</span>
+          <span class="action__title">Карты</span>
+          <span class="action__desc">Visa или UnionPay</span>
+        </button>
+      </section>
+
+      <section class="history">
+        <div class="history__header">
+          <h2>История</h2>
+          <button id="clearHistoryBtn" class="btn btn--text">Очистить</button>
+        </div>
+        <ul id="historyList" class="history__list"></ul>
+      </section>
+    </main>
+
+    <!-- Earn Modal -->
+    <div id="earnModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="earnTitle">
+      <div class="modal__content">
+        <div class="modal__header">
+          <h3 id="earnTitle">Заработать</h3>
+          <button class="modal__close" data-close>✕</button>
+        </div>
+        <div class="modal__body">
+          <p>Выберите сумму пополнения:</p>
+          <div class="btn-row">
+            <button class="btn" data-earn="50">+ $50</button>
+            <button class="btn" data-earn="150">+ $150</button>
+            <button class="btn btn--ghost" id="earnRandomBtn">Случайно</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send Modal -->
+    <div id="sendModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="sendTitle">
+      <div class="modal__content">
+        <div class="modal__header">
+          <h3 id="sendTitle">Отправить перевод</h3>
+          <button class="modal__close" data-close>✕</button>
+        </div>
+        <form id="sendForm" class="modal__body form">
+          <label class="field">
+            <span>Получатель</span>
+            <input id="sendRecipient" type="text" placeholder="Имя или номер счёта" required />
+          </label>
+          <label class="field">
+            <span>Сумма (USD)</span>
+            <input id="sendAmount" type="number" step="0.01" min="0" placeholder="0.00" required />
+          </label>
+          <label class="field">
+            <span>Назначение (необязательно)</span>
+            <input id="sendNote" type="text" placeholder="Комментарий" />
+          </label>
+          <div class="btn-row">
+            <button type="submit" class="btn">Отправить</button>
+            <button type="button" class="btn btn--ghost" data-close>Отмена</button>
+          </div>
+          <div id="sendError" class="form__error" role="alert" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Receive Modal -->
+    <div id="receiveModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="receiveTitle">
+      <div class="modal__content">
+        <div class="modal__header">
+          <h3 id="receiveTitle">Получить деньги</h3>
+          <button class="modal__close" data-close>✕</button>
+        </div>
+        <div class="modal__body">
+          <p class="muted">Ниже — вымышленные реквизиты для теста.</p>
+          <div class="kv">
+            <div>
+              <span class="kv__k">Банк</span>
+              <span class="kv__v">Liongung Bank</span>
+            </div>
+            <div>
+              <span class="kv__k">Получатель</span>
+              <span id="rqName" class="kv__v">Liongung User</span>
+              <button class="btn btn--tiny btn--ghost" data-copy="#rqName">Копировать</button>
+            </div>
+            <div>
+              <span class="kv__k">SWIFT</span>
+              <span id="rqSwift" class="kv__v">LIONGUSX</span>
+              <button class="btn btn--tiny btn--ghost" data-copy="#rqSwift">Копировать</button>
+            </div>
+            <div>
+              <span class="kv__k">Routing</span>
+              <span id="rqRouting" class="kv__v">123456789</span>
+              <button class="btn btn--tiny btn--ghost" data-copy="#rqRouting">Копировать</button>
+            </div>
+            <div>
+              <span class="kv__k">Account</span>
+              <span id="rqAccount" class="kv__v">000123456789</span>
+              <button class="btn btn--tiny btn--ghost" data-copy="#rqAccount">Копировать</button>
+            </div>
+            <div>
+              <span class="kv__k">Валюта</span>
+              <span class="kv__v">USD</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <form id="requestForm" class="form">
+            <label class="field">
+              <span>Сумма запроса (USD)</span>
+              <input id="requestAmount" type="number" min="0" step="0.01" placeholder="Например, 25" />
+            </label>
+            <label class="field">
+              <span>Комментарий</span>
+              <input id="requestNote" type="text" maxlength="100" placeholder="За обед" />
+            </label>
+            <div class="btn-row">
+              <button type="button" id="makePayLinkBtn" class="btn">Ссылка для оплаты</button>
+              <button type="button" id="copyRequisitesBtn" class="btn btn--ghost">Скопировать все реквизиты</button>
+            </div>
+            <div id="payLinkOut" class="muted"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards Modal -->
+    <div id="cardsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="cardsTitle">
+      <div class="modal__content">
+        <div class="modal__header">
+          <h3 id="cardsTitle">Карты</h3>
+          <button class="modal__close" data-close>✕</button>
+        </div>
+        <div class="modal__body">
+          <div class="card-issue">
+            <div class="card-issue__controls">
+              <label class="radio">
+                <input type="radio" name="brand" value="visa" checked />
+                <span>Visa</span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="brand" value="unionpay" />
+                <span>UnionPay</span>
+              </label>
+              <button id="issueCardBtn" class="btn">Выпустить карту</button>
+            </div>
+          </div>
+          <div>
+            <h4>Мои карты</h4>
+            <div id="cardsList" class="cards-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <p class="muted">
+        Этот сайт создан для демонстрации. Никаких реальных операций с деньгами не выполняется.
+      </p>
+      <a href="https://github.com/" target="_blank" rel="noopener" class="muted">GitHub Pages</a>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
