@@ -1,0 +1,167 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="icon" type="image/x-icon" href="images/favicon.png">
+
+    <script src="js/definitions.js" defer=""></script>
+    <script src="js/names.js" defer=""></script>
+    <script src="js/generator.js" defer=""></script>
+
+    <script src="js/script.js" defer=""></script>
+    <script src="js/handlers.js" defer=""></script>
+
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=780">
+    <title>Papers, Please Passport Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+
+
+    <meta name="title" content="The best Papers, Please Passport Generator">
+    <meta name="description" content="Generate yourself a very nice personalized passport and become an Arstotzkan.">
+    <meta name="keywords" content="papers please, documents, generator">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="woodendoors7">
+    <link rel="canonical" href="https://papers.floppa.hair/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://papers.floppa.hair/">
+    <meta property="og:title" content="The best Papers, Please Passport Generator">
+    <meta property="og:description" content="Generate yourself a very nice personalized passport and become an Arstotzkan.">
+    <meta property="og:image" content="images/floppacap.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://papers.floppa.hair/">
+    <meta property="twitter:title" content="The best Papers, Please Passport Generator">
+    <meta property="twitter:description" content="The best and only working Papers Please document generator">
+    <meta property="twitter:image" content="https://papers.floppa.hair/img/floppacap.png">
+
+    <script defer="" src="js/beacon.min.js" data-cf-beacon="{" token":="" "f26dea45385a443fa6cdaf31bdd87ecf"}"=""></script>
+
+    <style>
+    @media (max-width: 768px) {
+        #dropZone p {
+            display: none;
+        }
+    }
+    </style>
+
+</head>
+
+<body>
+    <div>
+        <a target="_blank" href="https://floppa.hair"><img src="images/floppacap.png" id="floppahair" style="width: 200px; " alt=""> </a>
+        <p style="margin-top: 0px; font-family: Nokia; font-size: 10px;">made by <a href="https://github.com/woodendoors7" target="_blank">woodendoors7</a></p>
+    </div>
+
+    <div class="logoCenter">
+
+    </div>
+    <div class="logoCenter">
+        <a target="_blank" href="https://store.steampowered.com/app/239030/Papers_Please/"><img class="logo" src="images/paperspleaselogo.png" style="width: 250px" alt="Papers, please">
+            <p style="color: white; font-size: 20px; line-height: 20px; margin-left: 40px;">a game by Lucas Pope</p>
+        </a>
+        <h1 style="font-size: 64px; line-height: 64px;">DOCUMENT GENERATOR</h1>
+    </div>
+
+    <div id="hideThis">
+        <img src="images/passport.png" alt="" id="passportPic" style="display: none;">
+        <div class="center">
+            <div>
+                <canvas width="1560" height="1944" id="passportCanvas">
+                </canvas>
+            </div>
+
+            <div id="settingsDiv" ondrop="dropHandler(event);" style="display: hidden;" ondragover="dragOverHandler(event)">
+                <div id="marginDiv">
+                    <form action="post" onsubmit="return false;" method="get">
+                        <label for="name">Your name: </label><input value="Costava, Jorji" type="textbox" id="name" name="name">
+                        <label for="dob">Date of birth: </label><input value="9.6.1963" type="textbox" name="dob" id="dob" class="dob">
+                        <br>
+                        <label for="sex">SEX: </label><input value="M" type="textbox" name="sex" id="sex"> <br>
+                        <label for="iss">Issuer: </label><input value="Azerbaijan" type="textbox" id="iss" name="iss">
+                        <label for="exp">Expiration date: </label><input value="3.4.2025" id="exp" type="textbox" name="exp" class="dob">
+                        <br>
+                        <label for="passid">Passport ID: </label><input value="37BR0-URJED" id="passid" type="textbox" name="passid">
+
+
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <div style="flex: 1; line-height: 3rem; height: 275px;">
+                                <p>Drag image here.</p>
+                                <div id="dropZone" ondragover="dragOverHandler(event);" style="margin-bottom: 0px;">
+                                    <img src="" id="dropImage" style="width: 200px; height: 200px;" alt="">
+                                </div>
+                                <!-- Добавленная кнопка для мобильных устройств -->
+                                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                <button class="issueButton" onclick="openFilePicker()" style="margin-top: 10px;">Choose Photo</button>
+                                <br>
+                            </div>
+
+                            <div style="flex: 1;">
+                                <br>
+                                <button class="issueButton" id="stampMode" onclick="toggleStamping()">Open Stamp
+                                    Rack</button>
+                                <button class="issueButton" id="issueButton" onclick="issuePass()">Issue
+                                    Passport</button>
+
+                                <button class="issueButton loadingButton" id="loadingButton" onclick="issuePass()" style="display: none;"><progress max="50" value="0" id="niceProgress"></progress></button>
+                            </div>
+                            <div class="break"></div>
+                            <button onclick="clearEverything()">Clear All</button> <button onclick="clearImage()">Clear
+                                image</button> <button onclick="clearStamps()">Clear stamps</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="unhideThis">
+        <div class="center" style="display: block;">
+            <img src="" style="width: 600px;" id="passImg" alt="">
+            <br>
+            <button id="download" onclick=""></button>
+        </div>
+    </div>
+    <div class="center">
+        <div class="content">
+            <main>
+                <h2 style="color:white; font-family: Pixelplay; text-align: left;">The best and only working Papers Please document generator there is.<br>You can use this site to make your own custom Arstotzkan passport, with a photo and everything.</h2>
+
+                <p class="articles">How to make a passport?</p>
+                <ol class="articles" style="color:white; font-family: pixelplay; font-size: 32px; line-height: 38px;" type="1">
+                    <li>Input personal information, like your Passport ID (A1B2C3-D4E5F6), name (Format: Surname, Name),
+                        and others</li>
+                    <li>Click and drag an image from your computer for the passport photo OR click "Choose Photo" on mobile.</li>
+                    <li>Open the stamp rack, and click the button again to cycle stamps. Click on the passport to stamp it.</li>
+                    <li>Click "Issue Passport" to generate your passport. Click the flashing "download" button to download it.</li>
+                    <li>All done! You've got your own passport.</li>
+                </ol>
+
+                <div>
+                    <p class="howShouldLookLike">This is how a passport should look like:</p>
+                    <img src="images/floppageneratedpassport.png" style="width: 400px;" alt="Example of a custom Arstotzkan passport">
+                </div>
+
+               
+                <p></p>
+            </main>
+
+                <a target="_blank" href="https://www.npmjs.com/minecraftstatuspinger" style="color: #221819">Best mc pinging
+        library!</a>
+    <a target="_blank" href="https://wooden.hashnode.dev/" style="color: #221819">hashnode blog</a>
+
+            
+        <a target="_blank" href="https://www.npmjs.com/~woodendoors_7" style="color: #221819">NPM woodendoors account</a>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+</body></html>
