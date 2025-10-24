@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Проверка паспорта + Платёж (демо) — номер только</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: linear-gradient(180deg,#04121a 0%, #031017 100%);
+    --accent: #6772e5;
+    --muted: #9fb0c8;
+    --panel:#0b1620;
+    --glass: rgba(255,255,255,0.03);
+    --ok:#10b981; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:#eaf6ff;padding:28px;display:flex;justify-content:center;}
+  .page{width:100%;max-width:1100px;}
+  .grid{display:grid;grid-template-columns:1fr 420px;gap:24px;}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+  .logo{width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(103,114,229,0.12), rgba(103,114,229,0.22));color:var(--accent);font-weight:800;font-size:20px;}
+  h1{margin:0;font-size:20px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 40px rgba(2,8,20,0.6);}
+  label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+  input,select,button,textarea{font-size:15px}
+  input, select, textarea{width:100%;padding:12px 14px;margin-top:8px;border-radius:10px;border:1px solid var(--glass);background:rgba(255,255,255,0.01);color:inherit}
+  .row{display:flex;gap:12px}
+  .row > *{flex:1}
+  .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+  .muted-note{color:var(--muted);font-size:13px;margin-top:8px}
+  .pay-box{margin-top:18px;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.007), rgba(255,255,255,0.003));border:1px solid rgba(255,255,255,0.02)}
+  .stripe-style{background:var(--panel);padding:14px;border-radius:10px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .card-visual{width:240px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#0f1724,#08121a);color:#fff;font-weight:700}
+  .brand-chip{font-size:12px;color:#fff;opacity:0.9;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:8px;display:inline-block;margin-top:8px}
+  .result-success{background:rgba(16,185,129,0.06);color:var(--ok);padding:10px;border-radius:8px;border:1px solid rgba(16,185,129,0.06)}
+  .result-fail{background:rgba(239,68,68,0.06);color:var(--bad);padding:10px;border-radius:8px;border:1px solid rgba(239,68,68,0.06)}
+  .history-entry{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.02)}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+  /* Larger amount input */
+  .amount-wide{font-size:18px;padding:14px 16px;}
+  .small-checkbox{display:flex;align-items:center;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">PV</div>
+      <div>
+        <h1>Проверка паспорта + Платёж (демо)</h1>
+        <p class="muted-note">Добавлена опция «Оплата только по номеру карты». <strong>Демо — не выполняет реальные транзакции.</strong></p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <section class="card">
+          <h2>Проверка паспорта</h2>
+          <label>Фамилия (латиница)</label>
+          <input id="surname" placeholder="Ivanov" pattern="^[A-Za-z'\\-\\s]+$">
+
+          <label>Имя (латиница)</label>
+          <input id="givenName" placeholder="Ivan" pattern="^[A-Za-z'\\-\\s]+$">
+
+          <label>Номер паспорта</label>
+          <input id="passportNumber" placeholder="12345-67890 или AB12C-3D4EF">
+
+          <div class="row">
+            <div>
+              <label>Дата рождения</label>
+              <input id="dob" type="date">
+            </div>
+            <div>
+              <label>Дата окончания</label>
+              <input id="expiry" type="date">
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:12px;">
+            <button id="autoCheck" class="btn" type="button">Проверить</button>
+            <button id="clearBtn" class="btn ghost" type="button">Очистить</button>
+          </div>
+        </section>
+
+        <section class="card pay-box" style="margin-top:16px;">
+          <h2>Платёж (имитация — НЕ реальная транзакция)</h2>
+
+          <div class="stripe-style" style="margin-bottom:12px;">
+            <div class="card-visual" id="cardVisual">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div id="visualBank" style="font-size:13px;opacity:0.95">LioungGoung</div>
+                <div class="brand-chip" id="visualBrand">—</div>
+              </div>
+              <div id="visualPan" style="font-size:18px;margin-top:12px;letter-spacing:2px">•••• •••• •••• ••••</div>
+              <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;">
+                <div id="visualHolder">CARDHOLDER</div>
+                <div id="visualExp">MM/YY</div>
+              </div>
+            </div>
+
+            <div style="flex:1;padding-left:8px;">
+              <label>Сумма (USD)</label>
+              <input id="amount" class="amount-wide" placeholder="Введите сумму (например 29.99)" type="number" min="0" step="0.01">
+              <div class="muted-note">Большое поле для удобства ввода суммы.</div>
+            </div>
+          </div>
+
+          <form id="paymentForm" onsubmit="return false;" class="form-small" aria-label="Платёжная форма (демо)">
+            <label>Номер карты</label>
+            <input id="cardNumber" inputmode="numeric" placeholder="4242 4242 4242 4242" autocomplete="off">
+
+            <div class="row">
+              <div>
+                <label>Месяц / Год</label>
+                <input id="cardExp" placeholder="MM/YY" autocomplete="off">
+              </div>
+              <div>
+                <label>CVC</label>
+                <input id="cardCvc" placeholder="123" inputmode="numeric" autocomplete="off">
+              </div>
+            </div>
+
+            <label>Имя на карте</label>
+            <input id="cardName" placeholder="Ivan Ivanov">
+
+            <div class="small-checkbox">
+              <input type="checkbox" id="cardOnly" />
+              <label for="cardOnly" style="margin:0;font-size:13px;color:var(--muted)">Оплатить только по номеру карты (без даты/CVC/имени)</label>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:12px;">
+              <button id="payBtn" class="btn" type="button">Списать (демо)</button>
+              <button id="resetPay" class="btn ghost" type="button">Сбросить</button>
+            </div>
+
+            <div id="payResult" style="margin-top:12px;"></div>
+
+            <div class="note-red" style="margin-top:12px;">
+              <strong>Важно:</strong> это безопасная имитация — данные не отправляются и не хранятся. Не используйте настоящие данные карт в демонстрационных формах.
+            </div>
+          </form>
+        </section>
+
+      </main>
+
+      <aside>
+        <section class="card" id="previewCard">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;color:var(--muted)">Превью документа</div>
+              <div style="font-weight:700;font-size:16px;margin-top:4px" id="fullName">—</div>
+            </div>
+            <div id="statusBadge" style="padding:8px 12px;border-radius:999px;font-weight:800;background:rgba(245,158,11,0.08);color:#f59e0b">Нет данных</div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:12px;align-items:center;">
+            <div style="width:96px;height:128px;border-radius:10px;background:linear-gradient(180deg,#071827,#02121a);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px" id="photo">—</div>
+            <div style="flex:1;">
+              <div style="color:var(--muted);margin-bottom:6px" id="pn">№ —</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="chip" id="dobChip">Родился —</div>
+                <div class="chip" id="ageChip">Возраст —</div>
+                <div class="chip" id="expChip">Действует до —</div>
+              </div>
+              <div id="reason" style="margin-top:10px;color:var(--muted);font-size:13px"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;color:var(--muted);font-size:13px">Прототип сравнивает дату окончания с датой в браузере и проверяет формат номера.</div>
+        </section>
+
+        <section class="card" style="margin-top:12px;">
+          <h3 style="margin:0 0 10px 0">История оплат (сессия)</h3>
+          <div id="history" style="min-height:80px;color:var(--muted)">Пока нет операций.</div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+<script>
+/* Passport logic (kept minimal) */
+const surname = document.getElementById('surname');
+const given = document.getElementById('givenName');
+const pnum = document.getElementById('passportNumber');
+const dob = document.getElementById('dob');
+const expiry = document.getElementById('expiry');
+const fullName = document.getElementById('fullName');
+const pn = document.getElementById('pn');
+const dobChip = document.getElementById('dobChip');
+const ageChip = document.getElementById('ageChip');
+const expChip = document.getElementById('expChip');
+const statusBadge = document.getElementById('statusBadge');
+const reason = document.getElementById('reason');
+const photo = document.getElementById('photo');
+
+function formatDate(input){ if(!input) return '—'; const d=new Date(input); if(isNaN(d)) return '—'; return d.toLocaleDateString('ru-RU',{year:'numeric',month:'2-digit',day:'2-digit'}); }
+function todayLocalDateOnly(){ const n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function calcAge(dobVal){ if(!dobVal) return null; const b=new Date(dobVal); if(isNaN(b)) return null; const t=todayLocalDateOnly(); let age=t.getFullYear()-b.getFullYear(); const m=t.getMonth()-b.getMonth(); if(m<0||(m===0 && t.getDate()<b.getDate())) age--; return age; }
+
+function validatePassport(){
+  const errs=[];
+  if(surname.value.trim() && !/^[A-Za-z'\-\s]+$/.test(surname.value.trim())) errs.push('Фамилия должна быть латиницей');
+  if(given.value.trim() && !/^[A-Za-z'\-\s]+$/.test(given.value.trim())) errs.push('Имя должна быть латиницей');
+  const number=pnum.value.trim();
+  if(!number) errs.push('Номер не указан');
+  else if(!(/^\d{5}-\d{5}$/.test(number) || /^[A-Z0-9]{5}-[A-Z0-9]{5}$/i.test(number))) errs.push('Формат номера неверный (ожидается 5-символов "-" 5-символов)');
+  const expiryVal=expiry.value;
+  if(!expiryVal) errs.push('Дата окончания не указана');
+  else{ const expDate=new Date(expiryVal); if(isNaN(expDate)) errs.push('Дата окончания некорректна'); else{ const exp=new Date(expDate.getFullYear(), expDate.getMonth(), expDate.getDate()); if(exp < todayLocalDateOnly()) errs.push('Документ просрочен'); }}
+  const age=calcAge(dob.value);
+  if(dob.value && (age===null || age<0 || age>130)) errs.push('Дата рождения выглядит неправдоподобной');
+  return errs;
+}
+function updatePreview(){
+  const g=given.value.trim(); const s=surname.value.trim();
+  fullName.textContent = (s||g)?((s? s+' ':'')+(g?g:'')):'—';
+  pn.textContent = '№ ' + (pnum.value.trim() || '—');
+  dobChip.textContent = 'Родился: ' + (formatDate(dob.value) || '—');
+  const age = calcAge(dob.value); ageChip.textContent = 'Возраст: ' + (age===null?'—': age + ' лет');
+  expChip.textContent = 'Действует до: ' + (formatDate(expiry.value) || '—');
+  const initials = ((surname.value[0]||'') + (given.value[0]||'')).toUpperCase();
+  photo.textContent = initials || '—';
+  const errs = validatePassport();
+  if(errs.length===0){
+    statusBadge.style.background='rgba(16,185,129,0.06)'; statusBadge.style.color='#10b981'; statusBadge.textContent='Валиден (формат и срок)'; reason.textContent='';
+  } else {
+    statusBadge.style.background='rgba(239,68,68,0.06)'; statusBadge.style.color='#ef4444'; statusBadge.textContent='Недействителен'; reason.innerHTML = errs.map((r,i)=> (i+1)+'. '+r).join('<br>');
+  }
+}
+document.getElementById('autoCheck').addEventListener('click', updatePreview);
+document.getElementById('clearBtn').addEventListener('click', ()=>{ surname.value=''; given.value=''; pnum.value=''; dob.value=''; expiry.value=''; updatePreview(); });
+[surname,given,pnum,dob,expiry].forEach(el=>el.addEventListener('input', updatePreview));
+updatePreview();
+
+/* Payment simulation with new features */
+// Elements
+const DEMO_BANK_NAME = 'LioungGoung';
+const cardNumber = document.getElementById('cardNumber');
+const cardExp = document.getElementById('cardExp');
+const cardCvc = document.getElementById('cardCvc');
+const cardName = document.getElementById('cardName');
+const amount = document.getElementById('amount');
+const cardOnlyCheckbox = document.getElementById('cardOnly');
+const payBtn = document.getElementById('payBtn');
+const resetPay = document.getElementById('resetPay');
+const payResult = document.getElementById('payResult');
+const visualPan = document.getElementById('visualPan');
+const visualHolder = document.getElementById('visualHolder');
+const visualExp = document.getElementById('visualExp');
+const visualBank = document.getElementById('visualBank');
+const visualBrand = document.getElementById('visualBrand');
+const historyEl = document.getElementById('history');
+
+// helpers
+function maskPan(pan){ const digits = pan.replace(/\s+/g,'').replace(/[^0-9A-Za-z]/g,''); if(digits.length<=4) return '•••• •••• •••• ' + digits; const last4 = digits.slice(-4); return '•••• •••• •••• ' + last4; }
+function sanitizePanInput(v){ return v.replace(/[^0-9A-Za-z]/g,'').replace(/(.{4})/g,'$1 ').trim(); }
+
+// brand detection by prefix
+function detectCardBrand(pan){
+  const digits = pan.replace(/\s+/g,'').replace(/[^0-9]/g,'');
+  if(!digits) return 'Unknown';
+  if(/^4/.test(digits)) return 'Visa';
+  if(/^5[1-5]/.test(digits)) return 'Mastercard';
+  if(/^2(2[2-9][1-9]|2[3-9]\d{2}|[3-6]\d{3}|7([01]\d{2}|20))/.test(digits)) return 'Mastercard';
+  if(/^3[47]/.test(digits)) return 'American Express';
+  if(/^6011/.test(digits) || /^65/.test(digits) || /^64[4-9]/.test(digits)) return 'Discover';
+  if(/^35/.test(digits)) return 'JCB';
+  if(/^36/.test(digits) || /^30[0-5]/.test(digits) || /^38/.test(digits)) return 'Diners Club';
+  return 'Unknown';
+}
+
+// auto-insert slash in expiry (MM/YY)
+cardExp.addEventListener('input', (e)=>{
+  let v = e.target.value.replace(/[^\d]/g,'');
+  if(v.length > 4) v = v.slice(0,4);
+  if(v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+  e.target.value = v;
+  visualExp.textContent = e.target.value || 'MM/YY';
+});
+
+// update visual
+function updateCardVisual(){
+  visualPan.textContent = cardNumber.value ? maskPan(cardNumber.value) : '•••• •••• •••• ••••';
+  visualHolder.textContent = cardName.value ? cardName.value.toUpperCase() : 'CARDHOLDER';
+  visualExp.textContent = cardExp.value || 'MM/YY';
+  visualBank.textContent = DEMO_BANK_NAME;
+  visualBrand.textContent = detectCardBrand(cardNumber.value);
+}
+[cardNumber, cardExp, cardName].forEach(el=>el.addEventListener('input', updateCardVisual));
+cardNumber.addEventListener('input', (e)=>{ e.target.value = sanitizePanInput(e.target.value); updateCardVisual(); });
+
+// parse expiry MM/YY or MM/YYYY or MM/YY with 2 or 4 digits
+function parseExpiry(exp){
+  if(!exp) return null;
+  const cleaned = exp.trim();
+  const mmyy = cleaned.match(/^(\d{1,2})\/(\d{2})$/);
+  const mmyyyy = cleaned.match(/^(\d{1,2})\/(\d{4})$/);
+  if(mmyyyy){
+    const month = parseInt(mmyyyy[1],10); const year = parseInt(mmyyyy[2],10);
+    if(month<1||month>12) return null;
+    return {month, year};
+  }
+  if(mmyy){
+    const month = parseInt(mmyy[1],10); let year = parseInt(mmyy[2],10);
+    year += (year < 80 ? 2000 : 1900);
+    if(month<1||month>12) return null;
+    return {month, year};
+  }
+  return null;
+}
+function isCardExpired(expField){
+  const parsed = parseExpiry(expField);
+  if(!parsed) return null;
+  const {month, year} = parsed;
+  const now = new Date();
+  const endOfMonth = new Date(year, month, 0);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return endOfMonth < today;
+}
+
+// Luhn check
+function luhnCheck(pan){
+  const digits = pan.replace(/\s+/g,'').replace(/[^0-9]/g,'');
+  if(digits.length < 12) return false;
+  let sum=0; let alt=false;
+  for(let i=digits.length-1;i>=0;i--){ let d=parseInt(digits.charAt(i),10); if(alt){ d*=2; if(d>9) d-=9 } sum+=d; alt=!alt; }
+  return sum%10===0;
+}
+
+// simulate charge
+function simulateCharge(){
+  payResult.innerHTML = '';
+  const amt = parseFloat(amount.value);
+  const pan = cardNumber.value.trim();
+  const exp = cardExp.value.trim();
+  const cvc = cardCvc.value.trim();
+  const name = cardName.value.trim();
+  const cardOnly = cardOnlyCheckbox.checked;
+
+  const errors = [];
+  if(!amt || isNaN(amt) || amt <= 0) errors.push('Введите корректную сумму (больше 0).');
+  if(!pan) errors.push('Номер карты не указан.');
+
+  // If not cardOnly, require expiry/cvc/name and validate
+  if(!cardOnly){
+    const parsed = parseExpiry(exp);
+    if(!exp) errors.push('Срок действия не указан.');
+    else if(!parsed) errors.push('Срок действия в неверном формате (MM/YY).');
+    else if(isCardExpired(exp)) errors.push('Срок действия карты прошёл — карта отклоняется.');
+
+    if(!cvc) errors.push('CVC не указан.');
+    if(!name) errors.push('Имя на карте не указано.');
+
+    // Luhn check for numeric PANs
+    const digitsOnly = pan.replace(/\s+/g,'').replace(/[^0-9]/g,'');
+    if(digitsOnly.length >= 12){
+      if(!luhnCheck(pan)) errors.push('Номер карты, похоже, некорректен (Luhn).');
+    } else {
+      errors.push('Номер карты должен содержать цифры в нормальном формате (для полной проверки).');
+    }
+  } else {
+    // cardOnly == true: allow any PAN (including fictional), skip expiry/cvc/name checks and Luhn
+  }
+
+  if(errors.length){
+    payResult.innerHTML = '<div class="result-fail">' + errors.map((e,i)=>'<div>'+(i+1)+'. '+e+'</div>').join('') + '</div>';
+    return;
+  }
+
+  // Process simulation
+  payResult.innerHTML = '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02)">Processing…</div>';
+  payBtn.disabled = true;
+
+  setTimeout(()=>{
+    // If cardOnly, make it slightly more likely to fail (simulate risk)
+    const successChance = cardOnly ? 0.8 : 0.92;
+    const success = Math.random() < successChance;
+    const brand = detectCardBrand(pan);
+    if(success){
+      const masked = maskPan(pan);
+      payResult.innerHTML = '<div class="result-success">Списание успешно: ' + amt.toFixed(2) + ' USD с карты ' + masked + ' (банк: ' + DEMO_BANK_NAME + ', система: ' + brand + ').</div>';
+      const now = new Date();
+      const entry = `<div class="history-entry">${now.toLocaleString()} — ${amt.toFixed(2)} USD — ${masked} — ${DEMO_BANK_NAME} — ${brand}</div>`;
+      if(historyEl.textContent.trim() === 'Пока нет операций.') historyEl.innerHTML = '';
+      historyEl.insertAdjacentHTML('afterbegin', entry);
+      // Clear sensitive inputs except amount/history remains
+      if(!cardOnly){
+        cardNumber.value=''; cardCvc.value=''; cardExp.value=''; cardName.value='';
+      } else {
+        // For cardOnly, clear only number and keep others
+        cardNumber.value='';
+      }
+      updateCardVisual();
+    } else {
+      payResult.innerHTML = '<div class="result-fail">Списание отклонено (симуляция). Попробуйте другие данные.</div>';
+    }
+    payBtn.disabled = false;
+  }, 700 + Math.random()*900);
+}
+
+payBtn.addEventListener('click', simulateCharge);
+resetPay.addEventListener('click', ()=>{
+  cardNumber.value=''; cardExp.value=''; cardCvc.value=''; cardName.value=''; amount.value='';
+  payResult.innerHTML=''; updateCardVisual();
+});
+
+// paste warning
+[cardNumber, cardCvc].forEach(el=>{
+  el.addEventListener('paste', (ev)=>{
+    const text = (ev.clipboardData || window.clipboardData).getData('text');
+    if(/[0-9]{12,}/.test(text)){
+      if(!confirm('Вы вставляете длинную последовательность цифр. Не используйте реальные данные карт в демонстрационных формах. Продолжить?')) ev.preventDefault();
+    }
+  });
+});
+
+// update visuals
+function updateCardVisual(){
+  visualPan.textContent = cardNumber.value ? maskPan(cardNumber.value) : '•••• •••• •••• ••••';
+  visualHolder.textContent = cardName.value ? cardName.value.toUpperCase() : 'CARDHOLDER';
+  visualExp.textContent = cardExp.value || 'MM/YY';
+  visualBrand.textContent = detectCardBrand(cardNumber.value);
+  visualBank.textContent = DEMO_BANK_NAME;
+}
+updateCardVisual();
+</script>
+</body>
+</html>
